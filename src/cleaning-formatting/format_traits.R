@@ -13,9 +13,9 @@
 
 library(tidyverse)
 
-traits <- read.csv('data/traits/SeedClim_Trait_data_2012_2016.csv') # available trait data
-Species <- read.csv('data/specieslist.csv') # list of species used in models
-gram <- read.csv('data/graminoids.csv') # filled in from memory + googling
+traits <- read.csv('../../data/traits/SeedClim_Trait_data_2012_2016.csv') # available trait data
+Species <- read.csv('../../data/specieslist.csv') # list of species used in models
+gram <- read.csv('../../data/graminoids.csv') # filled in from memory + googling
 
 # To do?: find and add seed mass trait from some other source! Ragnhild suggests: Kew, TRY, BIEN eller Tundra Trait Team 
 
@@ -39,7 +39,7 @@ traitlist = c('height_mm','leaf_area_cm2','SLA_cm2_g')
 traits <- traits[traits$trait %in% traitlist,]
 
 # save data frame in long format (all traits in same column)
-saveRDS(traits,'data/traits_long.RData')
+saveRDS(traits,'../../data_processed/traits_long.RData')
 
 # widen data frame to get one column per trait
 traitdf <- traits %>%
@@ -51,7 +51,7 @@ traitdf <- traits %>%
 # get only local maximum trait value instead of all 10 measurements
 maxtraitdf_local <- traits %>%
   pivot_wider(names_from = trait, values_from = value, values_fn = max)
-saveRDS(maxtraitdf_local,'data/trait_localmax.RData')
+saveRDS(maxtraitdf_local,'../../data_processed/trait_localmax.RData')
 
 # get mean of local maxima per species
 maxtraitdf <- maxtraitdf_local %>%
@@ -60,7 +60,7 @@ maxtraitdf <- maxtraitdf_local %>%
   summarise(height = mean(height_mm), 
             leaf_area = mean(leaf_area_cm2),
             sla = mean(SLA_cm2_g))
-saveRDS(maxtraitdf,'data/trait_max.RData')
+saveRDS(maxtraitdf,'../../data_processed/trait_max.RData')
 
 # split data on traits
 #----------------------------------------
