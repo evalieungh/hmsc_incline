@@ -8,11 +8,12 @@ https://orcid.org/0000-0003-4009-944X
 Natural History Museum, University of Oslo
 eva.lieungh[at]nhm.uio.no
 
-More info to come... 
+## NB! this is a work in progress. The scripts are not ready, and results may not be reproducible. Some scripts have been copied and modified from other online sources.
+
+### Contents
 
 | Folder or file name | Description       |
 | ------------------- | ----------- |
-| archive/ | files made redundant, old versions | 
 | data/ | raw and input data |
 | data_processed/ | modified data, intermediate files |
 | writing | manuscript drafts and backups, other texts |

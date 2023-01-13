@@ -37,12 +37,14 @@ library(graphics)  # identify points on ordination diagrams
 setwd('C:/Users/evaler/OneDrive - Universitetet i Oslo/Eva/PHD/hmsc_incline/src/analysis/')
 ord_df <- read.csv('../../data/VCG/INCLINE_community/INCLINE_community_2018_clean.csv')
 ord_df[1:5,1:10]
+
 # make precipitation column
 ord_df <- ord_df %>%
   mutate(prec = as.integer(ifelse(Site=='Skjellingahaugen',2725,
                                   ifelse(Site=='Gudmedalen',1925,
                                          ifelse(Site=='Lavisdalen',1321,
                                                 ifelse(Site=='Ulvehaugen',593,(.))))))) %>% 
+
   select(Site, prec, blockID, plotID, subPlotID, Ach_mil:Vio_sp)
 ord_df[1:5,1:10]
 
@@ -423,6 +425,7 @@ ord_df <- ord_df%>%
              mds3 = gnmds3_3,
              .before = 'Ach_mil')
 ord_df[1:5,1:10]
+
 saveRDS(ord_df,'../../data_processed/ord_df.Rds')
 
 # for each species (cols 7:123) column (margin=2), 
