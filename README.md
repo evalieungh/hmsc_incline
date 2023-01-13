@@ -8,12 +8,11 @@ https://orcid.org/0000-0003-4009-944X
 Natural History Museum, University of Oslo
 eva.lieungh[at]nhm.uio.no
 
-## NB! this is a work in progress. The scripts are not ready, and results may not be reproducible. Some scripts have been copied and modified from other online sources.
-
-### Contents
+More info to come... 
 
 | Folder or file name | Description       |
 | ------------------- | ----------- |
+| archive/ | files made redundant, old versions | 
 | data/ | raw and input data |
 | data_processed/ | modified data, intermediate files |
 | writing | manuscript drafts and backups, other texts |
@@ -28,5 +27,3 @@ eva.lieungh[at]nhm.uio.no
 PhD project funded by the Norwegian Ministry of Education and Research, through the Natural History Museum, University of Oslo.
 
 ### Sharing and access
-
-This code will have a permissive license (likely MIT). Copy snippets freely, but please refer to this repository if you use large parts of several scripts (that is, if you are doing most of the same analyses and your starting point is a copy of these scripts). 
