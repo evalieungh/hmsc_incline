@@ -16,7 +16,7 @@ library(lubridate) # date & time handling
 library(timetk) # time series plotting
 library(ggplot2) # nicer plotting
 library(ggridges) # ridge plots
-
+library(data.table) # to subset multiple date ranges effectively
 
 # read data
 setwd('C:/Users/evaler/OneDrive - Universitetet i Oslo/Eva/PHD/hmsc_incline/src/analysis/')
@@ -101,14 +101,50 @@ soil_mst <- readRDS('../../data_processed/soil_moisture_hourly_noOTC.Rds') # cre
 soil_mst[1:10,]
 ord_df <- readRDS('../../data_processed/ord_df.Rds') # made in community_gradientanalysis.R
 ord_df[1:5,1:10]
+  # the ordination has no use of the time series other than as independent background information. 
+  # the most interesting data is the logger-specific average( or max and/or min?) for the growing season. 
+  # To get this, I need to subset the growing seasons (assuming june--september), 
+  # group by logger ID
+  # and calcualte the mean (or max/min but let's start with mean)
 
-# the ordination has no use of the time series other than as independent background information. 
-# the most interesting data is the logger-specific average( or max and/or min?) for the growing season. 
-# To get this, I need to subset the growing seasons (assuming june--september), 
-# group by logger ID
-# and calcualte the mean (or max/min but let's start with mean)
-logger_means <- soil_mst %>%
-  filter(date >= '' & date <= '')
+# define growing season date ranges
+range <- data.table(start = lubridate::date(c('2019-06-01','2020-06-01','2021-06-01')), 
+                    end = lubridate::date(c('2019-09-30','2020-09-30','2021-09-30')))
 
-#filter(DATE >= as.Date('2013-08-15') & DATE <= as.Date('2013-10-15'))
+# subset only growing season
+soil_mst_sub <- setDT(soil_mst)[date %inrange% range]
+
+# calculate mean per plot ID
+plot_means <- soil_mst_sub %>%
+  group_by(plotID) %>%
+  summarise(soil_mst_mean = mean(na.omit(soil_moisture_h))) 
+
+plot_means <- as.data.frame(plot_means)
+
+# join new soil moisture column to ordination data frame
+ord_df2 <- merge(x = ord_df,
+                 all.x = TRUE,
+                 y = plot_means,
+                 by = 'plotID')
+
+ord_df2 <- ord_df2 %>% select(Site,prec,blockID,plotID,subPlotID:mds3,
+                              soil_mst_mean, everything())
+
+temp_df = ord_df
+
+temp_df["soil_mst_mean"] = NA
+temp_df["loggerID"] = NA
+
+for (row in 1:nrow(temp_df)) {
+  
+  if(temp_df[row, "plotID"] %in% logger_means$plotID) {
+    temp_df[row, "soil_mst_mean"] = logger_means$soil_mst_mean[
+      which(logger_means$plotID == temp_df[row, "plotID"])
+    ] 
+                                                 
+  } else {
+    temp_df[row, "soil_mst_mean"] = NA
+  }
+}
+
 
