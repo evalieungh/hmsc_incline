@@ -90,8 +90,6 @@ height$species[h.index]
 l.index = which(is.na(leaf_area$leaf_area_cm2), arr.ind = TRUE)
 leaf_area$species[l.index]
 
-
-
 # Make site-specific trait matrices?
 #----------------------------------------
 # Check for trait differences between sites

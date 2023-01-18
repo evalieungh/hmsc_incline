@@ -44,6 +44,7 @@ ord_df[1:5,1:10]
 # remove columns and rows without presences
 row0 <- which(rowSums(ord_df[,6:ncol(ord_df)])==0);length(row0) # some subplots are empty
 col0 <- which(colSums(ord_df[,6:ncol(ord_df)])==0) +5 ;length(col0) # some species are always absent (add 5 to get the correct column numbers in the col0 object, because we skip the first 5 columns)
+
 ord_df <- ord_df[-row0, -col0] # remove all-0 rows and columns
 rm(row0,col0) # clean up environment
 
@@ -85,14 +86,12 @@ plot(dca1,dca3)
 # dist.y <- vegdist(ord_df[,4:ncol(ord_df)], method="bray") 
 # saveRDS(dist.y,'data/dist_y.Rds')
 dist.y <- readRDS('../../data_processed/dist_y.Rds')
-str(dist.y)
 
 # Replace unreliable distances (B-C > 0.8 by geodetic distances, using the stepacross algorithm 
 # Note that the optimal value for epsilon is dataset-specific. For data sets in which one or more observations are weakly related to the rest (disjunct data sets), geodetic correction does not work unless a lower value for epsilon is chosen. In such cases, find the highest value for epsilon that provides results
 # geodist.y <- isomapdist(dist.y, epsilon=0.8) # NB! this step takes a long time
 # saveRDS(geodist.y,'data/geodist_y.Rds') 
 geodist.y <- readRDS('../../data_processed/geodist_y.Rds')
-str(geodist.y) 
 
 # select dimensionality for the GNMDS; k-dimensional GNMDS (k = 2, 3, ...).
 # k determines the number of dimensions in the ordination; typically we start with the 4-dimensional solution, thereafter reduce the number of dimensions 
@@ -171,7 +170,7 @@ plot(procrustes(mds.best,mds.secbest,permutations=999))
 saveRDS(gnmds3_1,'../../results/models/gnmds3_1.Rds')
 saveRDS(gnmds3_2,'../../results/models/gnmds3_2.Rds')
 saveRDS(gnmds3_3,'../../results/models/gnmds3_3.Rds')
- 
+
 # plot axes against each other
 plot(gnmds3_1,gnmds3_2)
 plot(gnmds3_1,gnmds3_3)
@@ -228,7 +227,6 @@ ord_df <- ord_df%>%
              mds3 = gnmds3_3,
              .before = 'Ach_mil')
 ord_df[1:5,1:10]
-
 saveRDS(ord_df,'../../data_processed/ord_df.Rds')
 
 # for each species (cols 7:123) column (margin=2), 
@@ -251,3 +249,6 @@ saveRDS(mds3var,'../../results/models/k3_mds3var.Rds')
 
 # further analysis in gnmds_analyses.R
 
+# --------------------------------------------------
+# sources/inspiration: 
+# Liu et al. 2008 Sommerfeltia
