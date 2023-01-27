@@ -167,6 +167,7 @@ air_tmp[1:10,]
 
 
 
+
 # subset only growing season
 soil_mst_sub <- setDT(soil_mst)[date %inrange% range]
 air_tmp_sub <- setDT(air_tmp)[date %inrange% range]
@@ -206,5 +207,6 @@ ord_df2 <- ord_df2 %>%
          soil_mst_mean, everything())
 
 saveRDS(ord_df2,'../../data_processed/ord_df2.Rds')
+
 
 

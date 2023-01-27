@@ -206,7 +206,7 @@ traitvec13_df$trait <- rownames(traitvec13_df)
          y = "gnmds axis 3") +
     theme_classic())
 
-# 2. CO-OCCURRENCES
+# 4. CO-OCCURRENCES
 # ------------------------------
 # get gnmds species score vs species score differences, test correlation to omegas
 omegas_l <- readRDS('../../data_processed/omegas_long.Rds') # from format_omegas.R
@@ -277,7 +277,6 @@ for (i in siteID) {
   print(cor(na.omit(test[test$mds_axis==3 | test$siteID == i,]$diff),
             na.omit(test[test$mds_axis==3 | test$siteID == i,]$omega)))
 }
-
 
 # --------------------------------------------------
 # sources/inspiration: 
