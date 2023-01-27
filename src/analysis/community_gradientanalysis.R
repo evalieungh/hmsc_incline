@@ -29,7 +29,6 @@
 
 library(tidyverse) # formatting
 library(vegan) # gradient analysis
-library(graphics)  # identify points on ordination diagrams
 
 # 1. VIEW AND FORMAT DATA
 # ------------------------------
@@ -59,11 +58,16 @@ ord_df_lav <- ord_df[ord_df$Site == 'Lavisdalen',]
 ord_df_gud <- ord_df[ord_df$Site == 'Gudmedalen',]
 
 # save dfs for later
-write.csv(ord_df_skj,'../../data_processed/ord_df_skj.csv')
-write.csv(ord_df_ulv,'../../data_processed/ord_df_ulv.csv')
-write.csv(ord_df_lav,'../../data_processed/ord_df_lav.csv')
-write.csv(ord_df_gud,'../../data_processed/ord_df_gud.csv')
-
+write.csv(ord_df_skj,'../../data_processed/ord_df_skj.csv', row.names = FALSE)
+write.csv(ord_df_ulv,'../../data_processed/ord_df_ulv.csv', row.names = FALSE)
+write.csv(ord_df_lav,'../../data_processed/ord_df_lav.csv', row.names = FALSE)
+write.csv(ord_df_gud,'../../data_processed/ord_df_gud.csv', row.names = FALSE)
+ # loading same objects
+ ord_df_skj <- read.csv('../../data_processed/ord_df_skj.csv')
+ ord_df_ulv <- read.csv('../../data_processed/ord_df_ulv.csv')
+ ord_df_lav <- read.csv('../../data_processed/ord_df_lav.csv')
+ ord_df_gud <- read.csv('../../data_processed/ord_df_gud.csv')
+ 
 # 2. DCA
 # ------------------------------
 # use decorana (de-trended cor-respondence ana-lysis) from J. Oksanen's vegan package
@@ -111,6 +115,22 @@ dca1_gud<-scores(dca_gud,display="sites",origin=FALSE)[,1]
 dca2_gud<-scores(dca_gud,display="sites",origin=FALSE)[,2]
 dca3_gud<-scores(dca_gud,display="sites",origin=FALSE)[,3]
 dca4_gud<-scores(dca_gud,display="sites",origin=FALSE)[,4]
+}
+
+# save plot scores
+dca_obj_list <- list(dca1_skj = dca1_skj,dca2_skj = dca2_skj,dca3_skj = dca3_skj,dca4_skj = dca4_skj,
+                     dca1_ulv = dca1_ulv,dca2_ulv = dca2_ulv,dca3_ulv = dca3_ulv,dca4_ulv = dca4_ulv,
+                     dca1_lav = dca1_lav,dca2_lav = dca2_lav,dca3_lav = dca3_lav,dca4_lav = dca4_lav,
+                     dca1_gud = dca1_gud,dca2_gud = dca2_gud,dca3_gud = dca3_gud,dca4_gud = dca4_gud)
+saveRDS(dca_obj_list,'../../data_processed/dca_list_plotscores_sitespecific.Rds')
+dca_list = c('dca1_skj','dca2_skj','dca3_skj','dca4_skj',
+             'dca1_ulv','dca2_ulv','dca3_ulv','dca4_ulv',
+             'dca1_lav','dca2_lav','dca3_lav','dca4_lav',
+             'dca1_gud','dca2_gud','dca3_gud','dca4_gud')
+for (i in dca_list) {
+  write.csv(as.data.frame(dca_obj_list[i]),
+            paste('../../data_processed/', i, '.csv', sep = ''),
+            row.names = FALSE)
 }
 
 # plot axes against each other
@@ -310,43 +330,88 @@ mds_gud <- readRDS('../../results/models/mds_k3_gud.Rds')
 
 # Extract the stress values as a vector. 
 # Stress values are provided by the 22th element in each "subobject list"
+# as mismatch between the rank order of distances in the data, 
+# and the rank order of distances in the ordination
 mds.stress <- unlist(lapply(mds,function(v){v[[22]]})) 
-
-mds.stress.skj <- unlist(lapply(mds_skj,function(v){v[[22]]}))
-mds.stress.ulv <- unlist(lapply(mds_ulv,function(v){v[[22]]}))
-mds.stress.lav <- unlist(lapply(mds_lav,function(v){v[[22]]}))
-mds.stress.gud <- unlist(lapply(mds_gud,function(v){v[[22]]}))
+{mds.stress.skj <- unlist(lapply(mds_skj,function(v){v[[22]]}))
+ mds.stress.ulv <- unlist(lapply(mds_ulv,function(v){v[[22]]}))
+ mds.stress.lav <- unlist(lapply(mds_lav,function(v){v[[22]]}))
+ mds.stress.gud <- unlist(lapply(mds_gud,function(v){v[[22]]}))}
 
 # view and order the stress values for the 100 MDSs:
 mds.stress
-ordered <- order(mds.stress) 
-ordered
+ordered <- order(mds.stress)
+{ordered.skj <- order(mds.stress.skj)
+ ordered.ulv <- order(mds.stress.ulv)
+ ordered.lav <- order(mds.stress.lav)
+ ordered.gud <- order(mds.stress.gud)}
 
 # get stress values for the solutions with the lowest and 2nd lowest stress
-mds.stress[ordered[1]] # these two should be similar
-mds.stress[ordered[2]] # large differences indicates artifact/local optima
+mds.stress[ordered[1]] # these two should be similar and small
+mds.stress[ordered[2]]
+
+mds.stress.skj[ordered.skj[1]] # 0.206 (lowest)
+mds.stress.skj[ordered.skj[2]]
+mds.stress.ulv[ordered.ulv[1]]
+mds.stress.ulv[ordered.ulv[2]]
+mds.stress.lav[ordered.lav[1]] 
+mds.stress.lav[ordered.lav[2]] # 0.236 (highest)
+mds.stress.gud[ordered.gud[1]]
+mds.stress.gud[ordered.gud[2]]
 
 # scale axes to half-change units and perform a varimax rotation by postMDS
 mds.best <- postMDS(mds[[ordered[1]]],geodist.y, 
                     pc = TRUE, halfchange = TRUE, threshold = 0.8)
-mds.best
-mds.secbest <- postMDS(mds[[ordered[2]]],geodist.y, 
+mds.2best <- postMDS(mds[[ordered[2]]],geodist.y, 
                        pc = TRUE, halfchange = TRUE, threshold = 0.8)
-mds.secbest
+{
+mds.best.skj <- postMDS(mds_skj[[ordered.skj[1]]],geodist.y.skj, 
+                     pc = TRUE, halfchange = TRUE, threshold = 0.8)
+mds.2best.skj <- postMDS(mds_skj[[ordered.skj[2]]],geodist.y.skj, 
+                        pc = TRUE, halfchange = TRUE, threshold = 0.8)
+mds.best.ulv <- postMDS(mds_ulv[[ordered.ulv[1]]],geodist.y.ulv, 
+                         pc = TRUE, halfchange = TRUE, threshold = 0.8)
+mds.2best.ulv <- postMDS(mds_ulv[[ordered.ulv[2]]],geodist.y.ulv, 
+                          pc = TRUE, halfchange = TRUE, threshold = 0.8)
+mds.best.lav <- postMDS(mds_lav[[ordered.lav[1]]],geodist.y.lav, 
+                         pc = TRUE, halfchange = TRUE, threshold = 0.8)
+mds.2best.lav <- postMDS(mds_lav[[ordered.lav[2]]],geodist.y.lav, 
+                          pc = TRUE, halfchange = TRUE, threshold = 0.8)
+mds.best.gud <- postMDS(mds_gud[[ordered.gud[1]]],geodist.y.gud, 
+                         pc = TRUE, halfchange = TRUE, threshold = 0.8)
+mds.2best.gud <- postMDS(mds_gud[[ordered.gud[2]]],geodist.y.gud, 
+                          pc = TRUE, halfchange = TRUE, threshold = 0.8)
+}
 
 # Procrustes comparisons
-procrustes(mds.best,mds.secbest,permutations=999) # Procrustes sum of squares
+procrustes(mds.best,mds.2best,permutations=999) # Procrustes sum of squares
   # 257.5 for k=2, 15.8 for k=3, 192.4 for K=4
-protest(mds.best,mds.secbest,permutations=999)
+protest(mds.best,mds.2best,permutations=999)
   # Procrustes Sum of Squares (m12 squared):        0.008272
   # Correlation in a symmetric Procrustes rotation: 0.9959
   # Significance:  0.001
   # OK, the two best solutions are similar like they should be
 
+procrustes(mds.best.skj,mds.2best.skj,permutations=999) # 5.3
+protest(mds.best.skj,mds.2best.skj,permutations=999) # *
+procrustes(mds.best.ulv,mds.2best.ulv,permutations=999) # 4.2
+protest(mds.best.ulv,mds.2best.ulv,permutations=999) # *
+procrustes(mds.best.lav,mds.2best.lav,permutations=999) # 0.82
+protest(mds.best.lav,mds.2best.lav,permutations=999) # *
+procrustes(mds.best.gud,mds.2best.gud,permutations=999) # 6.4
+protest(mds.best.gud,mds.2best.gud,permutations=999) # *
+
 # Procrustes plot
-plot(procrustes(mds.best,mds.secbest,permutations=999))
+plot(procrustes(mds.best,mds.2best,permutations=999))
+{ par(mfrow=c(2,2))
+plot(procrustes(mds.best.skj,mds.2best.skj,permutations=999), main = 'skj')
+plot(procrustes(mds.best.ulv,mds.2best.ulv,permutations=999), main = 'ulv')
+plot(procrustes(mds.best.lav,mds.2best.lav,permutations=999), main = 'lav')
+plot(procrustes(mds.best.gud,mds.2best.gud,permutations=999), main = 'gud')
+}
 
 # extract axes from lowest-stress mds
+ # global
   # # k = 2
   #  gnmds2_1 <- mds.best$points[,1]
   #  gnmds2_2 <- mds.best$points[,2]
@@ -359,19 +424,66 @@ plot(procrustes(mds.best,mds.secbest,permutations=999))
   # gnmds4_2 <- mds.best$points[,2]
   # gnmds4_3 <- mds.best$points[,3]
   # gnmds4_4 <- mds.best$points[,4]
+ 
+ # site-specific
+mds_axes <- data.frame(site = c(rep('skj',3*length(mds.best.skj$points[,1])),
+                                rep('ulv',3*length(mds.best.ulv$points[,1])),
+                                rep('lav',3*length(mds.best.lav$points[,1])),
+                                rep('gud',3*length(mds.best.gud$points[,1]))),
+                       axis_no = c(rep(1:3, each = length(mds.best.skj$points[,1])),
+                                   rep(1:3, each = length(mds.best.ulv$points[,1])),
+                                   rep(1:3, each = length(mds.best.lav$points[,1])),
+                                   rep(1:3, each = length(mds.best.gud$points[,1]))),
+                       ax_row_no = c(rep(1:length(mds.best.skj$points[,1]),3),
+                                     rep(1:length(mds.best.ulv$points[,1]),3),
+                                     rep(1:length(mds.best.lav$points[,1]),3),
+                                     rep(1:length(mds.best.gud$points[,1]),3)),
+                       axis_pts = c(
+                         gnmds_skj_3_1 = mds.best.skj$points[,1],
+                         gnmds_skj_3_2 = mds.best.skj$points[,2],
+                         gnmds_skj_3_3 = mds.best.skj$points[,3],
+                         gnmds_ulv_3_1 = mds.best.ulv$points[,1],
+                         gnmds_ulv_3_2 = mds.best.ulv$points[,2],
+                         gnmds_ulv_3_3 = mds.best.ulv$points[,3],
+                         gnmds_lav_3_1 = mds.best.lav$points[,1],
+                         gnmds_lav_3_2 = mds.best.lav$points[,2],
+                         gnmds_lav_3_3 = mds.best.lav$points[,3],
+                         gnmds_gud_3_1 = mds.best.gud$points[,1],
+                         gnmds_gud_3_2 = mds.best.gud$points[,2],
+                         gnmds_gud_3_3 = mds.best.gud$points[,3]))
 
 # save axes
 saveRDS(gnmds3_1,'../../results/models/gnmds3_1.Rds')
 saveRDS(gnmds3_2,'../../results/models/gnmds3_2.Rds')
 saveRDS(gnmds3_3,'../../results/models/gnmds3_3.Rds')
- 
+write.csv(mds_axes,'../../results/models/gnmds_axes_k3_sitespecific.csv')
+
 # plot axes against each other
 plot(gnmds3_1,gnmds3_2)
 plot(gnmds3_1,gnmds3_3)
+
+par(mfrow=c(1,2))
+sites = c('skj','ulv','lav','gud')
+plot(mds_axes[mds_axes$axis_no==1,]$axis_pts,
+     mds_axes[mds_axes$axis_no==2,]$axis_pts,
+     main = 'axes 1 and 2')
+for (j in sites) {
+  abline(lm(mds_axes[mds_axes$site==j|mds_axes$axis_no==1,]$axis_pts ~
+              mds_axes[mds_axes$site==j|mds_axes$axis_no==2,]$axis_pts))
+}
+plot(mds_axes[mds_axes$axis_no==1,]$axis_pts,
+     mds_axes[mds_axes$axis_no==3,]$axis_pts,
+     main = 'axes 1 and 3')
+for (j in sites) {
+  abline(lm(mds_axes[mds_axes$site==j|mds_axes$axis_no==1,]$axis_pts ~
+              mds_axes[mds_axes$site==j|mds_axes$axis_no==3,]$axis_pts))
+}
   
 # 4. CORRELATE DCA & GNMDS
 # ------------------------------
-# calculate Kendall's Tau non-parametric rank correlation coefficients 
+# calculate Kendall's Tau non-parametric rank correlation coefficients
+
+# global ordination (across all sites)
   # Following Liu et al. (2008; <DOI>), 
   # we commonly regard a tau = 0.4 as a minimum for claiming that
   # two axes express more or less the same core of variation.
@@ -404,6 +516,12 @@ plot(dca3,gnmds3_2)
   # Both DCA and GNMDS pick up the same 3 axes, 
   # but DCA axis 2 corresponds to GNMDS axis 3 and vice versa. 
   # Because DCA2 shows an artifact, we choose the nmds axes for further analyses
+
+# site-specific correlations
+  # is k=3 still appropriate?
+
+
+
 
 # 5. CALCULATE NMDS SPECIES SCORES
 # ------------------------------------
