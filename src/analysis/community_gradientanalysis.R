@@ -316,6 +316,7 @@ for(i in 1:100) {
                           k = 3, model = "global", maxit = 200,
                           smin = 1e-7, sfgrmin = 1e-7)
 }
+
 # save/overwrite or load mds object 
 saveRDS(mds,'../../results/models/mds_k3.Rds')
 saveRDS(mds_skj,'../../results/models/mds_k3_skj.Rds')
