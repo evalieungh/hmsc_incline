@@ -29,8 +29,8 @@ traits <- traits[traits$siteID %in% inclinesites,]
 traits$species <- gsub('[.]','_',traits$species) # replace . with _
 
 # remove redundant columns and species
-traits <- left_join(Species, traits %>% # keep all rows from species list but only rows from trait data where species match
-                      select(species,siteID,trait,value))
+traits <- left_join(Species, traits %>% 
+                      select(species,siteID,trait,value)) # keep all rows from species list but only rows from trait data where species match
 traits <- left_join(traits, gram)
 
 # remove redundant traits
