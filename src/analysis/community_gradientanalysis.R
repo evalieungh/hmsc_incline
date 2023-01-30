@@ -16,7 +16,7 @@
 # mds_k3.Rds
 
 # five ordinations with parallel methods:
-# first all data ('global' analysis), 
+# first all data ("global" analysis), 
 # then per individual site.
 # DCA and GNMDS. If the same axes appear in both methods, 
 # they are more likely to represent real gradients in species composition.
@@ -33,15 +33,15 @@ library(vegan) # gradient analysis
 # 1. VIEW AND FORMAT DATA
 # ------------------------------
 # read clean and formatted community data
-setwd('C:/Users/evaler/OneDrive - Universitetet i Oslo/Eva/PHD/hmsc_incline/src/analysis/')
-ord_df <- read.csv('../../data/VCG/INCLINE_community/INCLINE_community_2018_clean.csv')
+setwd("C:/Users/evaler/OneDrive - Universitetet i Oslo/Eva/PHD/hmsc_incline/src/analysis/")
+ord_df <- read.csv("../../data/VCG/INCLINE_community/INCLINE_community_2018_clean.csv")
 ord_df[1:5,1:10]
 # make precipitation column
 ord_df <- ord_df %>%
-  mutate(prec = as.integer(ifelse(Site=='Skjellingahaugen',2725,
-                                  ifelse(Site=='Gudmedalen',1925,
-                                         ifelse(Site=='Lavisdalen',1321,
-                                                ifelse(Site=='Ulvehaugen',593,(.))))))) %>% 
+  mutate(prec = as.integer(ifelse(Site=="Skjellingahaugen",2725,
+                                  ifelse(Site=="Gudmedalen",1925,
+                                         ifelse(Site=="Lavisdalen",1321,
+                                                ifelse(Site=="Ulvehaugen",593,(.))))))) %>% 
   select(Site, prec, blockID, plotID, subPlotID, Ach_mil:Vio_sp)
 ord_df[1:5,1:10]
 
@@ -52,25 +52,25 @@ ord_df <- ord_df[-row0, -col0] # remove all-0 rows and columns
 rm(row0,col0) # clean up environment
 
 # separate on site
-ord_df_skj <- ord_df[ord_df$Site == 'Skjellingahaugen',]
-ord_df_ulv <- ord_df[ord_df$Site == 'Ulvehaugen',]
-ord_df_lav <- ord_df[ord_df$Site == 'Lavisdalen',]
-ord_df_gud <- ord_df[ord_df$Site == 'Gudmedalen',]
+ord_df_skj <- ord_df[ord_df$Site == "Skjellingahaugen",]
+ord_df_ulv <- ord_df[ord_df$Site == "Ulvehaugen",]
+ord_df_lav <- ord_df[ord_df$Site == "Lavisdalen",]
+ord_df_gud <- ord_df[ord_df$Site == "Gudmedalen",]
 
 # save dfs for later
-write.csv(ord_df_skj,'../../data_processed/ord_df_skj.csv', row.names = FALSE)
-write.csv(ord_df_ulv,'../../data_processed/ord_df_ulv.csv', row.names = FALSE)
-write.csv(ord_df_lav,'../../data_processed/ord_df_lav.csv', row.names = FALSE)
-write.csv(ord_df_gud,'../../data_processed/ord_df_gud.csv', row.names = FALSE)
+write.csv(ord_df_skj,"../../data_processed/ord_df_skj.csv", row.names = FALSE)
+write.csv(ord_df_ulv,"../../data_processed/ord_df_ulv.csv", row.names = FALSE)
+write.csv(ord_df_lav,"../../data_processed/ord_df_lav.csv", row.names = FALSE)
+write.csv(ord_df_gud,"../../data_processed/ord_df_gud.csv", row.names = FALSE)
  # loading same objects
- ord_df_skj <- read.csv('../../data_processed/ord_df_skj.csv')
- ord_df_ulv <- read.csv('../../data_processed/ord_df_ulv.csv')
- ord_df_lav <- read.csv('../../data_processed/ord_df_lav.csv')
- ord_df_gud <- read.csv('../../data_processed/ord_df_gud.csv')
+ ord_df_skj <- read.csv("../../data_processed/ord_df_skj.csv")
+ ord_df_ulv <- read.csv("../../data_processed/ord_df_ulv.csv")
+ ord_df_lav <- read.csv("../../data_processed/ord_df_lav.csv")
+ ord_df_gud <- read.csv("../../data_processed/ord_df_gud.csv")
  
 # 2. DCA
 # ------------------------------
-# use decorana (de-trended cor-respondence ana-lysis) from J. Oksanen's vegan package
+# use decorana (de-trended cor-respondence ana-lysis) from J. Oksanen"s vegan package
 dca <- decorana(ord_df[,6:ncol(ord_df)]) # global analysis
 dca_skj <- decorana(ord_df_skj[,6:ncol(ord_df_skj)]) # per site
 dca_ulv <- decorana(ord_df_ulv[,6:ncol(ord_df_ulv)])
@@ -78,13 +78,13 @@ dca_lav <- decorana(ord_df_lav[,6:ncol(ord_df_lav)])
 dca_gud <- decorana(ord_df_gud[,6:ncol(ord_df_gud)])
 
 # preliminary plots of first 2 axes
-plot(dca, main= 'global') 
+plot(dca, main= "global") 
 {  dev.new()
   par(mfrow=c(2,2))
-  plot(dca_skj, main = 'Skj')
-  plot(dca_ulv, main = 'Ulv')
-  plot(dca_lav, main = 'Lav')
-  plot(dca_gud, main = 'Gud')
+  plot(dca_skj, main = "Skj")
+  plot(dca_ulv, main = "Ulv")
+  plot(dca_lav, main = "Lav")
+  plot(dca_gud, main = "Gud")
 }
 dev.off()
 
@@ -118,19 +118,27 @@ dca4_gud<-scores(dca_gud,display="sites",origin=FALSE)[,4]
 }
 
 # save plot scores
-dca_obj_list <- list(dca1_skj = dca1_skj,dca2_skj = dca2_skj,dca3_skj = dca3_skj,dca4_skj = dca4_skj,
-                     dca1_ulv = dca1_ulv,dca2_ulv = dca2_ulv,dca3_ulv = dca3_ulv,dca4_ulv = dca4_ulv,
-                     dca1_lav = dca1_lav,dca2_lav = dca2_lav,dca3_lav = dca3_lav,dca4_lav = dca4_lav,
-                     dca1_gud = dca1_gud,dca2_gud = dca2_gud,dca3_gud = dca3_gud,dca4_gud = dca4_gud)
-saveRDS(dca_obj_list,'../../data_processed/dca_list_plotscores_sitespecific.Rds')
-dca_list = c('dca1_skj','dca2_skj','dca3_skj','dca4_skj',
-             'dca1_ulv','dca2_ulv','dca3_ulv','dca4_ulv',
-             'dca1_lav','dca2_lav','dca3_lav','dca4_lav',
-             'dca1_gud','dca2_gud','dca3_gud','dca4_gud')
+dca_obj_list <- list(dca1_skj=dca1_skj,dca2_skj=dca2_skj,dca3_skj=dca3_skj,dca4_skj=dca4_skj,
+                     dca1_ulv=dca1_ulv,dca2_ulv=dca2_ulv,dca3_ulv=dca3_ulv,dca4_ulv=dca4_ulv,
+                     dca1_lav=dca1_lav,dca2_lav=dca2_lav,dca3_lav=dca3_lav,dca4_lav=dca4_lav,
+                     dca1_gud=dca1_gud,dca2_gud=dca2_gud,dca3_gud=dca3_gud,dca4_gud=dca4_gud)
+saveRDS(dca_obj_list,"../../data_processed/dca_list_plotscores_sitespecific.Rds")
+dca_obj_list <- readRDS("../../data_processed/dca_list_plotscores_sitespecific.Rds")
+dca_list = c("dca1_skj","dca2_skj","dca3_skj","dca4_skj",
+             "dca1_ulv","dca2_ulv","dca3_ulv","dca4_ulv",
+             "dca1_lav","dca2_lav","dca3_lav","dca4_lav",
+             "dca1_gud","dca2_gud","dca3_gud","dca4_gud")
 for (i in dca_list) {
   write.csv(as.data.frame(dca_obj_list[i]),
-            paste('../../data_processed/', i, '.csv', sep = ''),
+            paste("../../data_processed/", i, ".csv", sep = ""),
             row.names = FALSE)
+}
+
+# read dca plot scores
+dca_obj_list <- readRDS("../../data_processed/dca_list_plotscores_sitespecific.Rds") # global
+for (i in 1:length(dca_list)) { # site-specific
+  assign(paste(dca_list[i]),
+         read.csv(paste("../../data_processed/", dca_list[i], ".csv", sep = "")))
 }
 
 # plot axes against each other
@@ -150,6 +158,49 @@ plot(dca1_lav,dca3_lav)
 plot(dca1_gud,dca2_gud)
 plot(dca1_gud,dca3_gud)
 
+# check whether site-specific axes look similar
+  # axes 1 and 2
+{plot(x = dca1_skj$dca1_skj, y =  dca2_skj$dca2_skj,
+     xlim = c(-0.2,4), ylim = c(-0.2, 4),
+     cex = 0.5, col = "black",
+     main = "site-specific dca axis 1 vs 2",
+     xlab = "axis 1", ylab = "axis 2")
+  points(dca1_ulv$dca1_ulv,dca2_ulv$dca2_ulv,
+         cex = 0.5, col = "blue")
+  points(dca1_lav$dca1_lav,dca2_lav$dca2_lav,
+         cex = 0.5, col = "green")
+  points(dca1_gud$dca1_gud,dca2_gud$dca2_gud,
+         cex = 0.5, col = "red")
+  abline(lm(dca1_skj$dca1_skj ~ dca2_skj$dca2_skj), col = "black")
+  abline(lm(dca1_ulv$dca1_ulv ~ dca2_ulv$dca2_ulv), col = "blue")
+  abline(lm(dca1_lav$dca1_lav ~ dca2_lav$dca2_lav), col = "green")
+  abline(lm(dca1_gud$dca1_gud ~ dca2_gud$dca2_gud), col = "red")
+}
+  # direct correlations of axes between the sites are not possible because they are
+  # different length (some species were omitted from analysis because they were 
+  # missing from one site but not others). Could potentially go back and remove 
+  # species that lack occurrences in some site(s) to force them to be comparable, 
+  # but I deem it more important to keep the information in the species presences 
+  # (i.e. the real species compositional differences between sites!). 
+
+  # axes 1 and 3
+{plot(x = dca1_skj$dca1_skj, y =  dca3_skj$dca3_skj,
+      xlim = c(-0.2,4), ylim = c(-0.2, 4),
+      cex = 0.5, col = "black",
+      main = "site-specific dca axis 1 vs 3",
+      xlab = "axis 1", ylab = "axis 3")
+  points(dca1_ulv$dca1_ulv,dca3_ulv$dca3_ulv,
+         cex = 0.5, col = "blue")
+  points(dca1_lav$dca1_lav,dca3_lav$dca3_lav,
+         cex = 0.5, col = "green")
+  points(dca1_gud$dca1_gud,dca3_gud$dca3_gud,
+         cex = 0.5, col = "red")
+  abline(lm(dca1_skj$dca1_skj ~ dca3_skj$dca3_skj), col = "black")
+  abline(lm(dca1_ulv$dca1_ulv ~ dca3_ulv$dca3_ulv), col = "blue")
+  abline(lm(dca1_lav$dca1_lav ~ dca3_lav$dca3_lav), col = "green")
+  abline(lm(dca1_gud$dca1_gud ~ dca3_gud$dca3_gud), col = "red")
+ }
+
 # calculate gradient lenghts
   # global
   (grl1<-max(dca1)-min(dca1)) # 5.3
@@ -157,7 +208,7 @@ plot(dca1_gud,dca3_gud)
   (grl3<-max(dca3)-min(dca3)) # 3.6
   (grl4<-max(dca4)-min(dca4)) # 3.1
   # site-specific
-grl_sites <- data.frame(site = rep(c('Skjellingahaugen', 'Ulvehaugen', 'Lavisdalen', 'Gudmedalen'),
+grl_sites <- data.frame(site = rep(c("Skjellingahaugen", "Ulvehaugen", "Lavisdalen", "Gudmedalen"),
                                    each = 4),
                         prec = rep(c(2725,593,1321,1925), each = 4),
                         axis = rep(1:4,4), 
@@ -180,7 +231,7 @@ grl_sites <- data.frame(site = rep(c('Skjellingahaugen', 'Ulvehaugen', 'Lavisdal
                                    grl2_gud = max(dca2_gud)-min(dca2_gud),
                                    grl3_gud = max(dca3_gud)-min(dca3_gud),
                                    grl4_gud = max(dca4_gud)-min(dca4_gud)))
-write.csv(grl_sites,'../../data_processed/gradient_lengths_dca.csv')
+write.csv(grl_sites,"../../data_processed/gradient_lengths_dca.csv")
 plot(grl_sites$prec,grl_sites$length) # looks like the gradient lenght (indicating largest turnover in species composition) may have an optimum in medium-dry sites. 
 
 # extract DCA species scores
@@ -219,45 +270,45 @@ plot(grl_sites$prec,grl_sites$length) # looks like the gradient lenght (indicati
 # First, make proportional dissimilarity (=Bray-Curtis) dissimilarity matrix
   # global
 dist.y <- vegdist(ord_df[,4:ncol(ord_df)], method="bray")
-saveRDS(dist.y,'../../data_processed/dist_y.Rds')
-dist.y <- readRDS('../../data_processed/dist_y.Rds')
+saveRDS(dist.y,"../../data_processed/dist_y.Rds")
+dist.y <- readRDS("../../data_processed/dist_y.Rds")
   # site-specific
 dist.y.skj <- vegdist(ord_df_skj[,6:ncol(ord_df_skj)], method="bray")
 dist.y.ulv <- vegdist(ord_df_ulv[,6:ncol(ord_df_ulv)], method="bray")
 dist.y.lav <- vegdist(ord_df_lav[,6:ncol(ord_df_lav)], method="bray")
 dist.y.gud <- vegdist(ord_df_gud[,6:ncol(ord_df_gud)], method="bray")
 
-saveRDS(dist.y.skj,'../../data_processed/dist_y_skj.Rds')
-saveRDS(dist.y.ulv,'../../data_processed/dist_y_ulv.Rds')
-saveRDS(dist.y.lav,'../../data_processed/dist_y_lav.Rds')
-saveRDS(dist.y.gud,'../../data_processed/dist_y_gud.Rds')
+saveRDS(dist.y.skj,"../../data_processed/dist_y_skj.Rds")
+saveRDS(dist.y.ulv,"../../data_processed/dist_y_ulv.Rds")
+saveRDS(dist.y.lav,"../../data_processed/dist_y_lav.Rds")
+saveRDS(dist.y.gud,"../../data_processed/dist_y_gud.Rds")
 
-dist.y.skj <- readRDS('../../data_processed/dist_y_skj.Rds')
-dist.y.ulv <- readRDS('../../data_processed/dist_y_ulv.Rds')
-dist.y.lav <- readRDS('../../data_processed/dist_y_lav.Rds')
-dist.y.gud <- readRDS('../../data_processed/dist_y_gud.Rds')
+dist.y.skj <- readRDS("../../data_processed/dist_y_skj.Rds")
+dist.y.ulv <- readRDS("../../data_processed/dist_y_ulv.Rds")
+dist.y.lav <- readRDS("../../data_processed/dist_y_lav.Rds")
+dist.y.gud <- readRDS("../../data_processed/dist_y_gud.Rds")
 
 # Replace unreliable distances (B-C > 0.8 by geodetic distances, using the stepacross algorithm 
 # Note that the optimal value for epsilon is dataset-specific. For data sets in which one or more observations are weakly related to the rest (disjunct data sets), geodetic correction does not work unless a lower value for epsilon is chosen. In such cases, find the highest value for epsilon that provides results
   # global
 geodist.y <- isomapdist(dist.y, epsilon=0.8) # NB! this step takes a long time
-saveRDS(geodist.y,'data/geodist_y.Rds')
-geodist.y <- readRDS('../../data_processed/geodist_y.Rds')
+saveRDS(geodist.y,"data/geodist_y.Rds")
+geodist.y <- readRDS("../../data_processed/geodist_y.Rds")
   # site-specific
 geodist.y.skj <- isomapdist(dist.y.skj, epsilon=0.8)
 geodist.y.ulv <- isomapdist(dist.y.ulv, epsilon=0.8)
 geodist.y.lav <- isomapdist(dist.y.lav, epsilon=0.8)
 geodist.y.gud <- isomapdist(dist.y.gud, epsilon=0.8)
 
-saveRDS(geodist.y.skj,'../../data_processed/geodist_y_skj.Rds')
-saveRDS(geodist.y.ulv,'../../data_processed/geodist_y_ulv.Rds')
-saveRDS(geodist.y.lav,'../../data_processed/geodist_y_lav.Rds')
-saveRDS(geodist.y.gud,'../../data_processed/geodist_y_gud.Rds')
+saveRDS(geodist.y.skj,"../../data_processed/geodist_y_skj.Rds")
+saveRDS(geodist.y.ulv,"../../data_processed/geodist_y_ulv.Rds")
+saveRDS(geodist.y.lav,"../../data_processed/geodist_y_lav.Rds")
+saveRDS(geodist.y.gud,"../../data_processed/geodist_y_gud.Rds")
 
-geodist.y.skj <- readRDS('../../data_processed/geodist_y_skj.Rds')
-geodist.y.ulv <- readRDS('../../data_processed/geodist_y_ulv.Rds')
-geodist.y.lav <- readRDS('../../data_processed/geodist_y_lav.Rds')
-geodist.y.gud <- readRDS('../../data_processed/geodist_y_gud.Rds')
+geodist.y.skj <- readRDS("../../data_processed/geodist_y_skj.Rds")
+geodist.y.ulv <- readRDS("../../data_processed/geodist_y_ulv.Rds")
+geodist.y.lav <- readRDS("../../data_processed/geodist_y_lav.Rds")
+geodist.y.gud <- readRDS("../../data_processed/geodist_y_gud.Rds")
 
 # select dimensionality for the GNMDS; k-dimensional GNMDS (k = 2, 3, ...).
 # k determines the number of dimensions in the ordination; typically we start with the 4-dimensional solution, thereafter reduce the number of dimensions 
@@ -274,7 +325,7 @@ mds_gud <- NULL
 
 # make several MDSs (here 100) from random initial starting configurations,
 # and allocate the solutions to the mds object.
-# Remember to fit the right value of k into the statement 'k= ...' below
+# Remember to fit the right value of k into the statement "k= ..." below
 # NB! time-consuming. For the global data set, it takes >10 hrs, and the mds object is ~10 GB
   # global
 for(i in 1:100) {
@@ -316,17 +367,17 @@ for(i in 1:100) {
                           smin = 1e-7, sfgrmin = 1e-7)
 }
 # save/overwrite or load mds object 
-saveRDS(mds,'../../results/models/mds_k3.Rds')
-saveRDS(mds_skj,'../../results/models/mds_k3_skj.Rds')
-saveRDS(mds_ulv,'../../results/models/mds_k3_ulv.Rds')
-saveRDS(mds_lav,'../../results/models/mds_k3_lav.Rds')
-saveRDS(mds_gud,'../../results/models/mds_k3_gud.Rds')
+saveRDS(mds,"../../results/models/mds_k3.Rds")
+saveRDS(mds_skj,"../../results/models/mds_k3_skj.Rds")
+saveRDS(mds_ulv,"../../results/models/mds_k3_ulv.Rds")
+saveRDS(mds_lav,"../../results/models/mds_k3_lav.Rds")
+saveRDS(mds_gud,"../../results/models/mds_k3_gud.Rds")
 
-mds <- readRDS('../../results/models/mds_k3.Rds')
-mds_skj <- readRDS('../../results/models/mds_k3_skj.Rds')
-mds_ulv <- readRDS('../../results/models/mds_k3_ulv.Rds')
-mds_lav <- readRDS('../../results/models/mds_k3_lav.Rds')
-mds_gud <- readRDS('../../results/models/mds_k3_gud.Rds')
+mds <- readRDS("../../results/models/mds_k3.Rds")
+mds_skj <- readRDS("../../results/models/mds_k3_skj.Rds")
+mds_ulv <- readRDS("../../results/models/mds_k3_ulv.Rds")
+mds_lav <- readRDS("../../results/models/mds_k3_lav.Rds")
+mds_gud <- readRDS("../../results/models/mds_k3_gud.Rds")
 
 # Extract the stress values as a vector. 
 # Stress values are provided by the 22th element in each "subobject list"
@@ -404,10 +455,10 @@ protest(mds.best.gud,mds.2best.gud,permutations=999) # *
 # Procrustes plot
 plot(procrustes(mds.best,mds.2best,permutations=999))
 { par(mfrow=c(2,2))
-plot(procrustes(mds.best.skj,mds.2best.skj,permutations=999), main = 'skj')
-plot(procrustes(mds.best.ulv,mds.2best.ulv,permutations=999), main = 'ulv')
-plot(procrustes(mds.best.lav,mds.2best.lav,permutations=999), main = 'lav')
-plot(procrustes(mds.best.gud,mds.2best.gud,permutations=999), main = 'gud')
+plot(procrustes(mds.best.skj,mds.2best.skj,permutations=999), main = "skj")
+plot(procrustes(mds.best.ulv,mds.2best.ulv,permutations=999), main = "ulv")
+plot(procrustes(mds.best.lav,mds.2best.lav,permutations=999), main = "lav")
+plot(procrustes(mds.best.gud,mds.2best.gud,permutations=999), main = "gud")
 }
 
 # extract axes from lowest-stress mds
@@ -426,10 +477,10 @@ plot(procrustes(mds.best.gud,mds.2best.gud,permutations=999), main = 'gud')
   # gnmds4_4 <- mds.best$points[,4]
  
  # site-specific
-mds_axes <- data.frame(site = c(rep('skj',3*length(mds.best.skj$points[,1])),
-                                rep('ulv',3*length(mds.best.ulv$points[,1])),
-                                rep('lav',3*length(mds.best.lav$points[,1])),
-                                rep('gud',3*length(mds.best.gud$points[,1]))),
+mds_axes <- data.frame(site = c(rep("skj",3*length(mds.best.skj$points[,1])),
+                                rep("ulv",3*length(mds.best.ulv$points[,1])),
+                                rep("lav",3*length(mds.best.lav$points[,1])),
+                                rep("gud",3*length(mds.best.gud$points[,1]))),
                        axis_no = c(rep(1:3, each = length(mds.best.skj$points[,1])),
                                    rep(1:3, each = length(mds.best.ulv$points[,1])),
                                    rep(1:3, each = length(mds.best.lav$points[,1])),
@@ -453,27 +504,33 @@ mds_axes <- data.frame(site = c(rep('skj',3*length(mds.best.skj$points[,1])),
                          gnmds_gud_3_3 = mds.best.gud$points[,3]))
 
 # save axes
-saveRDS(gnmds3_1,'../../results/models/gnmds3_1.Rds')
-saveRDS(gnmds3_2,'../../results/models/gnmds3_2.Rds')
-saveRDS(gnmds3_3,'../../results/models/gnmds3_3.Rds')
-write.csv(mds_axes,'../../results/models/gnmds_axes_k3_sitespecific.csv')
+saveRDS(gnmds3_1,"../../results/models/gnmds3_1.Rds")
+saveRDS(gnmds3_2,"../../results/models/gnmds3_2.Rds")
+saveRDS(gnmds3_3,"../../results/models/gnmds3_3.Rds")
+write.csv(mds_axes,"../../results/models/gnmds_axes_k3_sitespecific.csv")
+
+# read axis objects
+gnmds3_1 <- readRDS("../../results/models/gnmds3_1.Rds")
+gnmds3_2 <- readRDS("../../results/models/gnmds3_2.Rds")
+gnmds3_3 <- readRDS("../../results/models/gnmds3_3.Rds")
+mds_axes <- read.csv("../../results/models/gnmds_axes_k3_sitespecific.csv")
 
 # plot axes against each other
 plot(gnmds3_1,gnmds3_2)
 plot(gnmds3_1,gnmds3_3)
 
 par(mfrow=c(1,2))
-sites = c('skj','ulv','lav','gud')
+sites = c("skj","ulv","lav","gud")
 plot(mds_axes[mds_axes$axis_no==1,]$axis_pts,
      mds_axes[mds_axes$axis_no==2,]$axis_pts,
-     main = 'axes 1 and 2')
+     main = "axes 1 and 2")
 for (j in sites) {
   abline(lm(mds_axes[mds_axes$site==j|mds_axes$axis_no==1,]$axis_pts ~
               mds_axes[mds_axes$site==j|mds_axes$axis_no==2,]$axis_pts))
 }
 plot(mds_axes[mds_axes$axis_no==1,]$axis_pts,
      mds_axes[mds_axes$axis_no==3,]$axis_pts,
-     main = 'axes 1 and 3')
+     main = "axes 1 and 3")
 for (j in sites) {
   abline(lm(mds_axes[mds_axes$site==j|mds_axes$axis_no==1,]$axis_pts ~
               mds_axes[mds_axes$site==j|mds_axes$axis_no==3,]$axis_pts))
@@ -481,7 +538,7 @@ for (j in sites) {
   
 # 4. CORRELATE DCA & GNMDS
 # ------------------------------
-# calculate Kendall's Tau non-parametric rank correlation coefficients
+# calculate Kendall"s Tau non-parametric rank correlation coefficients
 
 # global ordination (across all sites)
   # Following Liu et al. (2008; <DOI>), 
@@ -489,7 +546,7 @@ for (j in sites) {
   # two axes express more or less the same core of variation.
   # Preliminary mds run with k=4 gave cor.test(dca1,gnmds4_1,method="k") result 
   # tau = 0.8068197, p < 2.2e-16. Other axes had very low tau. 
-  # Preliminary mds run with k=2 gave two 'strong' correlations: 
+  # Preliminary mds run with k=2 gave two "strong" correlations: 
   # dca1,gnmds2_1 tau=-0.7821  p<2.2e-16
   # dca3,gnmds2_2 tau=0.3996  p<2.2e-16
   # but several others were close.
@@ -519,9 +576,23 @@ plot(dca3,gnmds3_2)
 
 # site-specific correlations
   # is k=3 still appropriate?
+plot(x = mds_axes[mds_axes$axis_no==1 | mds_axes$site=="skj",]$axis_pts, 
+     y = mds_axes[mds_axes$axis_no==2 | mds_axes$site=="skj",]$axis_pts,
+     main = "",
+     xlab = "axis 1", ylab = "axis 2",
+     col = "red", cex = 0.5)
+  points(scale(dca1_skj$dca1_skj, scale = FALSE),
+         scale(dca2_skj$dca2_skj, scale = FALSE),
+         col = "blue", cex = 0.5)
+  abline(lm(mds_axes[mds_axes$axis_no==1 | mds_axes$site=="skj",]$axis_pts
+            ~ mds_axes[mds_axes$axis_no==2 | mds_axes$site=="skj",]$axis_pts),
+         col = "red", lwd = 2)
+  abline(lm(scale(dca1_skj$dca1_skj, scale = FALSE)
+            ~ scale(dca2_skj$dca2_skj, scale = FALSE)),
+         col = "blue", lwd = 2)
+  
 
-
-
+# re-run dca with subplotID kept in the data set so I can add back NAs for the omitted subplots!
 
 # 5. CALCULATE NMDS SPECIES SCORES
 # ------------------------------------
@@ -537,15 +608,14 @@ ord_df <- ord_df%>%
   add_column(mds1 = gnmds3_1, 
              mds2 = gnmds3_2, 
              mds3 = gnmds3_3,
-             .before = 'Ach_mil')
+             .before = "Ach_mil")
 ord_df[1:5,1:10]
-
-saveRDS(ord_df,'../../data_processed/ord_df.Rds')
+saveRDS(ord_df,"../../data_processed/ord_df.Rds")
 
 # for each species (cols 7:123) column (margin=2), 
 # sum the product of the species presences and 
 # the plot scores for an ordination axis, and divide this 
-# by the number of presences to get the species' average plot score per axis
+# by the number of presences to get the species" average plot score per axis
 mds1var <- apply(ord_df[,7:ncol(ord_df)], 2,
                  function(x) sum(x * ord_df$mds1) / sum(x))
 mds2var <- apply(ord_df[,7:ncol(ord_df)], 2,
@@ -556,9 +626,9 @@ mds3var <- apply(ord_df[,7:ncol(ord_df)], 2,
 plot(dca1var,mds1var) # corresponds well to DCA results. Note scale difference
 
 # save axes
-saveRDS(mds1var,'../../results/models/k3_mds1var.Rds')
-saveRDS(mds2var,'../../results/models/k3_mds2var.Rds')
-saveRDS(mds3var,'../../results/models/k3_mds3var.Rds')
+saveRDS(mds1var,"../../results/models/k3_mds1var.Rds")
+saveRDS(mds2var,"../../results/models/k3_mds2var.Rds")
+saveRDS(mds3var,"../../results/models/k3_mds3var.Rds")
 
 # further analysis in gnmds_analyses.R
 
