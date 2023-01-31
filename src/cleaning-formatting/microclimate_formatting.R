@@ -27,7 +27,8 @@ library(data.table) # to subset multiple date ranges effectively
 # read data
 setwd('C:/Users/evaler/OneDrive - Universitetet i Oslo/Eva/PHD/hmsc_incline/src/analysis/')
 soil_mst <- read.csv(
-  '../../data/VCG/INCLINE_microclimate/data_cleaned/INCLINE_microclimate_soil_moisture.csv')
+  '../../data/VCG/INCLINE_microclimate/data_cleaned
+  /INCLINE_microclimate_soil_moisture.csv')
 air_tmp <- read.csv(
   '../../data/VCG/INCLINE_microclimate/data_cleaned/INCLINE_microclimate_air_temperature.csv')
 grnd_tmp <- read.csv(

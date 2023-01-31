@@ -77,8 +77,17 @@ dca_ulv <- decorana(ord_df_ulv[,6:ncol(ord_df_ulv)])
 dca_lav <- decorana(ord_df_lav[,6:ncol(ord_df_lav)])
 dca_gud <- decorana(ord_df_gud[,6:ncol(ord_df_gud)])
 
+# save dca objects
+saveRDS(dca,"../../results/models/dca_global.Rds")
+saveRDS(dca_skj,"../../results/models/dca_skj.Rds")
+saveRDS(dca_ulv,"../../results/models/dca_ulv.Rds")
+saveRDS(dca_lav,"../../results/models/dca_lav.Rds")
+saveRDS(dca_gud,"../../results/models/dca_gud.Rds")
+
 # preliminary plots of first 2 axes
+  # global
 plot(dca, main= "global") 
+  # site-specific
 {  dev.new()
   par(mfrow=c(2,2))
   plot(dca_skj, main = "Skj")
@@ -95,6 +104,7 @@ dev.off()
   dca3<-scores(dca,display="sites",origin=FALSE)[,3]
   dca4<-scores(dca,display="sites",origin=FALSE)[,4]
 }
+
 {  # site-specific
 dca1_skj<-scores(dca_skj,display="sites",origin=FALSE)[,1]
 dca2_skj<-scores(dca_skj,display="sites",origin=FALSE)[,2]
@@ -158,23 +168,26 @@ plot(dca1_lav,dca3_lav)
 plot(dca1_gud,dca2_gud)
 plot(dca1_gud,dca3_gud)
 
-# check whether site-specific axes look similar
+# check whether site-specific axes look similar to the global ones
   # axes 1 and 2
-{plot(x = dca1_skj$dca1_skj, y =  dca2_skj$dca2_skj,
-     xlim = c(-0.2,4), ylim = c(-0.2, 4),
-     cex = 0.5, col = "black",
-     main = "site-specific dca axis 1 vs 2",
+{plot(x = dca1, y =  dca2,
+     xlim = c(-0.2,5), ylim = c(-0.2, 4),
+     cex = 0.5, col = "grey",
+     main = "site-specific plotted over global dca, axes 1 vs 2",
+     sub = "black=Skj,blue=Ulv,green=Lav,red=Gud",
      xlab = "axis 1", ylab = "axis 2")
+  points(dca1_skj$dca1_skj,dca2_skj$dca2_skj,
+       cex = 0.5, col = "black")
   points(dca1_ulv$dca1_ulv,dca2_ulv$dca2_ulv,
          cex = 0.5, col = "blue")
   points(dca1_lav$dca1_lav,dca2_lav$dca2_lav,
          cex = 0.5, col = "green")
   points(dca1_gud$dca1_gud,dca2_gud$dca2_gud,
          cex = 0.5, col = "red")
-  abline(lm(dca1_skj$dca1_skj ~ dca2_skj$dca2_skj), col = "black")
-  abline(lm(dca1_ulv$dca1_ulv ~ dca2_ulv$dca2_ulv), col = "blue")
-  abline(lm(dca1_lav$dca1_lav ~ dca2_lav$dca2_lav), col = "green")
-  abline(lm(dca1_gud$dca1_gud ~ dca2_gud$dca2_gud), col = "red")
+  abline(lm(dca1_skj$dca1_skj ~ dca2_skj$dca2_skj), lwd = 2, col = "black")
+  abline(lm(dca1_ulv$dca1_ulv ~ dca2_ulv$dca2_ulv), lwd = 2, col = "blue")
+  abline(lm(dca1_lav$dca1_lav ~ dca2_lav$dca2_lav), lwd = 2, col = "green")
+  abline(lm(dca1_gud$dca1_gud ~ dca2_gud$dca2_gud), lwd = 2, col = "red")
 }
   # direct correlations of axes between the sites are not possible because they are
   # different length (some species were omitted from analysis because they were 
@@ -184,22 +197,25 @@ plot(dca1_gud,dca3_gud)
   # (i.e. the real species compositional differences between sites!). 
 
   # axes 1 and 3
-{plot(x = dca1_skj$dca1_skj, y =  dca3_skj$dca3_skj,
-      xlim = c(-0.2,4), ylim = c(-0.2, 4),
-      cex = 0.5, col = "black",
-      main = "site-specific dca axis 1 vs 3",
+{plot(x = dca1, y =  dca3,
+      xlim = c(-0.2,5), ylim = c(-0.2, 4),
+      cex = 0.5, col = "grey",
+      main = "site-specific plotted over global dca, axes 1 vs 3",
+      sub = "black=Skj,blue=Ulv,green=Lav,red=Gud",
       xlab = "axis 1", ylab = "axis 3")
+  points(dca1_skj$dca1_skj,dca3_skj$dca3_skj,
+         cex = 0.5, col = "black")
   points(dca1_ulv$dca1_ulv,dca3_ulv$dca3_ulv,
          cex = 0.5, col = "blue")
   points(dca1_lav$dca1_lav,dca3_lav$dca3_lav,
          cex = 0.5, col = "green")
   points(dca1_gud$dca1_gud,dca3_gud$dca3_gud,
          cex = 0.5, col = "red")
-  abline(lm(dca1_skj$dca1_skj ~ dca3_skj$dca3_skj), col = "black")
-  abline(lm(dca1_ulv$dca1_ulv ~ dca3_ulv$dca3_ulv), col = "blue")
-  abline(lm(dca1_lav$dca1_lav ~ dca3_lav$dca3_lav), col = "green")
-  abline(lm(dca1_gud$dca1_gud ~ dca3_gud$dca3_gud), col = "red")
- }
+  abline(lm(dca1_skj$dca1_skj ~ dca3_skj$dca3_skj), lwd = 3, col = "black")
+  abline(lm(dca1_ulv$dca1_ulv ~ dca3_ulv$dca3_ulv), lwd = 3, col = "blue")
+  abline(lm(dca1_lav$dca1_lav ~ dca3_lav$dca3_lav), lwd = 3, col = "green")
+  abline(lm(dca1_gud$dca1_gud ~ dca3_gud$dca3_gud), lwd = 3, col = "red")
+}
 
 # calculate gradient lenghts
   # global
@@ -312,8 +328,9 @@ geodist.y.gud <- readRDS("../../data_processed/geodist_y_gud.Rds")
 
 # select dimensionality for the GNMDS; k-dimensional GNMDS (k = 2, 3, ...).
 # k determines the number of dimensions in the ordination; typically we start with the 4-dimensional solution, thereafter reduce the number of dimensions 
-# (see axis correlations below - decided to re-run with 3 after initial test with 4)
-k = 3
+# (see axis correlations below - decided to re-run global with 3 after initial test with 4, and site-specific with 2 after initial test with 3)
+k.glob = 3
+k.site = 2
 
 # define general, empty multi-dimensional-scaling object called mds:
 mds <- NULL
@@ -330,9 +347,9 @@ mds_gud <- NULL
   # global
 for(i in 1:100) {
   mds[[i]] <- monoMDS(geodist.y,
-                      matrix(c(runif(dim(ord_df[,6:ncol(ord_df)])[1]*k)),
+                      matrix(c(runif(dim(ord_df[,6:ncol(ord_df)])[1]*k.glob)),
                              nrow = dim(ord_df[,6:ncol(ord_df)])[1]),
-                      k = 3, # number of dimensions (=axes) to use
+                      k = k.glob, # number of dimensions (=axes) to use
                       model = "global", # "global" is normal non-metric MDS with a monotone regression
                       maxit = 200,
                       smin = 1e-7, sfgrmin = 1e-7)
@@ -340,30 +357,30 @@ for(i in 1:100) {
   # site-specific
 for(i in 1:100) {
   mds_skj[[i]] <- monoMDS(geodist.y.skj,
-                          matrix(c(runif(dim(ord_df_skj[,6:ncol(ord_df_skj)])[1]*k)),
+                          matrix(c(runif(dim(ord_df_skj[,6:ncol(ord_df_skj)])[1]*k.site)),
                                  nrow = dim(ord_df_skj[,6:ncol(ord_df_skj)])[1]),
-                          k = 3, model = "global", maxit = 200,
+                          k = k.site, model = "global", maxit = 200,
                           smin = 1e-7, sfgrmin = 1e-7)
 }
 for(i in 1:100) {
   mds_ulv[[i]] <- monoMDS(geodist.y.ulv,
-                          matrix(c(runif(dim(ord_df_ulv[,6:ncol(ord_df_ulv)])[1]*k)),
+                          matrix(c(runif(dim(ord_df_ulv[,6:ncol(ord_df_ulv)])[1]*k.site)),
                                  nrow = dim(ord_df_ulv[,6:ncol(ord_df_ulv)])[1]),
-                          k = 3, model = "global", maxit = 200,
+                          k = k.site, model = "global", maxit = 200,
                           smin = 1e-7, sfgrmin = 1e-7)
 }
 for(i in 1:100) {
   mds_lav[[i]] <- monoMDS(geodist.y.lav,
-                          matrix(c(runif(dim(ord_df_lav[,6:ncol(ord_df_lav)])[1]*k)),
+                          matrix(c(runif(dim(ord_df_lav[,6:ncol(ord_df_lav)])[1]*k.site)),
                                  nrow = dim(ord_df_lav[,6:ncol(ord_df_lav)])[1]),
-                          k = 3, model = "global", maxit = 200,
+                          k = k.site, model = "global", maxit = 200,
                           smin = 1e-7, sfgrmin = 1e-7)
 }
 for(i in 1:100) {
   mds_gud[[i]] <- monoMDS(geodist.y.gud,
-                          matrix(c(runif(dim(ord_df_gud[,6:ncol(ord_df_gud)])[1]*k)),
+                          matrix(c(runif(dim(ord_df_gud[,6:ncol(ord_df_gud)])[1]*k.site)),
                                  nrow = dim(ord_df_gud[,6:ncol(ord_df_gud)])[1]),
-                          k = 3, model = "global", maxit = 200,
+                          k = k.site, model = "global", maxit = 200,
                           smin = 1e-7, sfgrmin = 1e-7)
 }
 # save/overwrite or load mds object 
@@ -401,12 +418,12 @@ ordered <- order(mds.stress)
 mds.stress[ordered[1]] # these two should be similar and small
 mds.stress[ordered[2]]
 
-mds.stress.skj[ordered.skj[1]] # 0.206 (lowest)
+mds.stress.skj[ordered.skj[1]]
 mds.stress.skj[ordered.skj[2]]
-mds.stress.ulv[ordered.ulv[1]]
+mds.stress.ulv[ordered.ulv[1]] # 0.271 (lowest)
 mds.stress.ulv[ordered.ulv[2]]
 mds.stress.lav[ordered.lav[1]] 
-mds.stress.lav[ordered.lav[2]] # 0.236 (highest)
+mds.stress.lav[ordered.lav[2]] # 0.310 (highest)
 mds.stress.gud[ordered.gud[1]]
 mds.stress.gud[ordered.gud[2]]
 
@@ -443,13 +460,13 @@ protest(mds.best,mds.2best,permutations=999)
   # Significance:  0.001
   # OK, the two best solutions are similar like they should be
 
-procrustes(mds.best.skj,mds.2best.skj,permutations=999) # 5.3
+procrustes(mds.best.skj,mds.2best.skj,permutations=999) # 58.6
 protest(mds.best.skj,mds.2best.skj,permutations=999) # *
-procrustes(mds.best.ulv,mds.2best.ulv,permutations=999) # 4.2
+procrustes(mds.best.ulv,mds.2best.ulv,permutations=999) # 3.721
 protest(mds.best.ulv,mds.2best.ulv,permutations=999) # *
-procrustes(mds.best.lav,mds.2best.lav,permutations=999) # 0.82
+procrustes(mds.best.lav,mds.2best.lav,permutations=999) # 2.134
 protest(mds.best.lav,mds.2best.lav,permutations=999) # *
-procrustes(mds.best.gud,mds.2best.gud,permutations=999) # 6.4
+procrustes(mds.best.gud,mds.2best.gud,permutations=999) # 6.01
 protest(mds.best.gud,mds.2best.gud,permutations=999) # *
 
 # Procrustes plot
@@ -477,63 +494,59 @@ plot(procrustes(mds.best.gud,mds.2best.gud,permutations=999), main = "gud")
   # gnmds4_4 <- mds.best$points[,4]
  
  # site-specific
-mds_axes <- data.frame(site = c(rep("skj",3*length(mds.best.skj$points[,1])),
-                                rep("ulv",3*length(mds.best.ulv$points[,1])),
-                                rep("lav",3*length(mds.best.lav$points[,1])),
-                                rep("gud",3*length(mds.best.gud$points[,1]))),
-                       axis_no = c(rep(1:3, each = length(mds.best.skj$points[,1])),
-                                   rep(1:3, each = length(mds.best.ulv$points[,1])),
-                                   rep(1:3, each = length(mds.best.lav$points[,1])),
-                                   rep(1:3, each = length(mds.best.gud$points[,1]))),
-                       ax_row_no = c(rep(1:length(mds.best.skj$points[,1]),3),
-                                     rep(1:length(mds.best.ulv$points[,1]),3),
-                                     rep(1:length(mds.best.lav$points[,1]),3),
-                                     rep(1:length(mds.best.gud$points[,1]),3)),
+mds_axes <- data.frame(site = c(rep("skj",2*length(mds.best.skj$points[,1])),
+                                rep("ulv",2*length(mds.best.ulv$points[,1])),
+                                rep("lav",2*length(mds.best.lav$points[,1])),
+                                rep("gud",2*length(mds.best.gud$points[,1]))),
+                       axis_no = c(rep(1:2, each = length(mds.best.skj$points[,1])),
+                                   rep(1:2, each = length(mds.best.ulv$points[,1])),
+                                   rep(1:2, each = length(mds.best.lav$points[,1])),
+                                   rep(1:2, each = length(mds.best.gud$points[,1]))),
+                       ax_row_no = c(rep(1:length(mds.best.skj$points[,1]),2),
+                                     rep(1:length(mds.best.ulv$points[,1]),2),
+                                     rep(1:length(mds.best.lav$points[,1]),2),
+                                     rep(1:length(mds.best.gud$points[,1]),2)),
                        axis_pts = c(
-                         gnmds_skj_3_1 = mds.best.skj$points[,1],
-                         gnmds_skj_3_2 = mds.best.skj$points[,2],
-                         gnmds_skj_3_3 = mds.best.skj$points[,3],
-                         gnmds_ulv_3_1 = mds.best.ulv$points[,1],
-                         gnmds_ulv_3_2 = mds.best.ulv$points[,2],
-                         gnmds_ulv_3_3 = mds.best.ulv$points[,3],
-                         gnmds_lav_3_1 = mds.best.lav$points[,1],
-                         gnmds_lav_3_2 = mds.best.lav$points[,2],
-                         gnmds_lav_3_3 = mds.best.lav$points[,3],
-                         gnmds_gud_3_1 = mds.best.gud$points[,1],
-                         gnmds_gud_3_2 = mds.best.gud$points[,2],
-                         gnmds_gud_3_3 = mds.best.gud$points[,3]))
+                         gnmds_skj_2_1 = mds.best.skj$points[,1],
+                         gnmds_skj_2_2 = mds.best.skj$points[,2],
+                         gnmds_ulv_2_1 = mds.best.ulv$points[,1],
+                         gnmds_ulv_2_2 = mds.best.ulv$points[,2],
+                         gnmds_lav_2_1 = mds.best.lav$points[,1],
+                         gnmds_lav_2_2 = mds.best.lav$points[,2],
+                         gnmds_gud_2_1 = mds.best.gud$points[,1],
+                         gnmds_gud_2_2 = mds.best.gud$points[,2]))
 
 # save axes
 saveRDS(gnmds3_1,"../../results/models/gnmds3_1.Rds")
 saveRDS(gnmds3_2,"../../results/models/gnmds3_2.Rds")
 saveRDS(gnmds3_3,"../../results/models/gnmds3_3.Rds")
-write.csv(mds_axes,"../../results/models/gnmds_axes_k3_sitespecific.csv")
+write.csv(mds_axes,"../../results/models/gnmds_axes_k2_sitespecific.csv")
+
+# alternative wide format
+mds_obj_list <- mds_axes %>%
+  select(site, axis_no, ax_row_no, axis_pts) %>%
+  pivot_wider(names_from = c(site,axis_no),
+              values_from = axis_pts)
+write.csv(mds_obj_list,"../../data_processed/mds_k2_plotscore_axes.csv", row.names = FALSE)
 
 # read axis objects
 gnmds3_1 <- readRDS("../../results/models/gnmds3_1.Rds")
 gnmds3_2 <- readRDS("../../results/models/gnmds3_2.Rds")
 gnmds3_3 <- readRDS("../../results/models/gnmds3_3.Rds")
-mds_axes <- read.csv("../../results/models/gnmds_axes_k3_sitespecific.csv")
+mds_axes <- read.csv("../../results/models/gnmds_axes_k2_sitespecific.csv")
 
 # plot axes against each other
 plot(gnmds3_1,gnmds3_2)
 plot(gnmds3_1,gnmds3_3)
 
-par(mfrow=c(1,2))
 sites = c("skj","ulv","lav","gud")
 plot(mds_axes[mds_axes$axis_no==1,]$axis_pts,
      mds_axes[mds_axes$axis_no==2,]$axis_pts,
-     main = "axes 1 and 2")
+     main = "gnmds plot scores, axes 1 and 2",
+     xlab = "gnmds axis 1", ylab = "gnmds axis 2")
 for (j in sites) {
   abline(lm(mds_axes[mds_axes$site==j|mds_axes$axis_no==1,]$axis_pts ~
               mds_axes[mds_axes$site==j|mds_axes$axis_no==2,]$axis_pts))
-}
-plot(mds_axes[mds_axes$axis_no==1,]$axis_pts,
-     mds_axes[mds_axes$axis_no==3,]$axis_pts,
-     main = "axes 1 and 3")
-for (j in sites) {
-  abline(lm(mds_axes[mds_axes$site==j|mds_axes$axis_no==1,]$axis_pts ~
-              mds_axes[mds_axes$site==j|mds_axes$axis_no==3,]$axis_pts))
 }
   
 # 4. CORRELATE DCA & GNMDS
@@ -576,23 +589,81 @@ plot(dca3,gnmds3_2)
 
 # site-specific correlations
   # is k=3 still appropriate?
-plot(x = mds_axes[mds_axes$axis_no==1 | mds_axes$site=="skj",]$axis_pts, 
-     y = mds_axes[mds_axes$axis_no==2 | mds_axes$site=="skj",]$axis_pts,
-     main = "",
-     xlab = "axis 1", ylab = "axis 2",
-     col = "red", cex = 0.5)
-  points(scale(dca1_skj$dca1_skj, scale = FALSE),
-         scale(dca2_skj$dca2_skj, scale = FALSE),
-         col = "blue", cex = 0.5)
-  abline(lm(mds_axes[mds_axes$axis_no==1 | mds_axes$site=="skj",]$axis_pts
-            ~ mds_axes[mds_axes$axis_no==2 | mds_axes$site=="skj",]$axis_pts),
-         col = "red", lwd = 2)
-  abline(lm(scale(dca1_skj$dca1_skj, scale = FALSE)
-            ~ scale(dca2_skj$dca2_skj, scale = FALSE)),
-         col = "blue", lwd = 2)
-  
+mds_obj_list <- as.data.frame(read.csv("../../data_processed/mds_k2_plotscore_axes.csv"))
+ # SKJELLINGAHAUGEN
+for (i in 1:4) { # i denotes dca columns
+  for (j in 2:3) { # j for mds columns
+    correlations <- cor.test(dca_obj_list[[i]],
+                             mds_obj_list[,j],
+                             method="k")
+    out <- paste("Kendall's rank correlation tau", 
+                 "dca_ax_col:", i, 
+                 "mds_ax_col:", j,
+                 "z:", correlations$statistic,
+                 "p:", correlations$p.value,
+                 "tau:", correlations$estimate,
+                 sep = ",")
+    write(out, 
+          file = "../../results/cda_mds_k2_cor_skj.txt", 
+          append=TRUE)
+  }
+}
+ # ULVEHAUGEN
+for (i in 5:8) { # i denotes dca columns
+  for (j in 4:5) { # j for mds columns
+    correlations <- cor.test(dca_obj_list[[i]],
+                             na.omit(mds_obj_list[,j]),
+                             method="k")
+    out <- paste("Kendall's rank correlation tau", 
+                 "dca_ax_col:", i, 
+                 "mds_ax_col:", j,
+                 "z:", correlations$statistic,
+                 "p:", correlations$p.value,
+                 "tau:", correlations$estimate,
+                 sep = ",")
+    write(out, 
+          file = "../../results/cda_mds_k2_cor_ulv.txt", 
+          append=TRUE)
+  }
+}
+ # LAVISDALEN
+for (i in 9:12) { # i denotes dca columns
+  for (j in 6:7) { # j for mds columns
+    correlations <- cor.test(dca_obj_list[[i]],
+                             na.omit(mds_obj_list[,j]),
+                             method="k")
+    out <- paste("Kendall's rank correlation tau", 
+                 "dca_ax_col:", i, 
+                 "mds_ax_col:", j,
+                 "z:", correlations$statistic,
+                 "p:", correlations$p.value,
+                 "tau:", correlations$estimate,
+                 sep = ",")
+    write(out, 
+          file = "../../results/cda_mds_k2_cor_lav.txt", 
+          append=TRUE)
+  }
+}
+ # GUDMEDALEN
+for (i in 13:16) { # i denotes dca columns
+  for (j in 8:9) { # j for mds columns
+    correlations <- cor.test(dca_obj_list[[i]],
+                             na.omit(mds_obj_list[,j]),
+                             method="k")
+    out <- paste("Kendall's rank correlation tau", 
+                 "dca_ax_col:", i, 
+                 "mds_ax_col:", j,
+                 "z:", correlations$statistic,
+                 "p:", correlations$p.value,
+                 "tau:", correlations$estimate,
+                 sep = ",")
+    write(out, 
+          file = "../../results/cda_mds_k2_cor_gud.txt", 
+          append=TRUE)
+  }
+}
 
-# re-run dca with subplotID kept in the data set so I can add back NAs for the omitted subplots!
+######################## REPEAT PER SITE FOR THE REST TOO! ####################
 
 # 5. CALCULATE NMDS SPECIES SCORES
 # ------------------------------------
