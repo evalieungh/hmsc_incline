@@ -65,6 +65,13 @@ length(col0) # some species are always absent (add 5 to get the correct column n
 ord_df <- ord_df[-row0,-col0] # remove all-0 rows and columns
 rm(row0, col0) # clean up environment
 
+
+# save/load global ordination data frame
+write.csv(ord_df,
+          "../../data_processed/ordination_dataframe_global.csv",
+          row.names = FALSE)
+ord_df <- read.csv("../../data_processed/ordination_dataframe_global.csv")
+
 # separate on site
 ord_df_skj <- ord_df[ord_df$Site == "Skjellingahaugen", ]
 ord_df_ulv <- ord_df[ord_df$Site == "Ulvehaugen", ]
