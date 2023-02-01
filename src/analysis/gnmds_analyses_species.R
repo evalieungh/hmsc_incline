@@ -1,6 +1,6 @@
-#############################
-#    gnmds axes analysis    #
-#############################
+#####################################################
+#    gnmds axes analysis: co-occurrences, traits    #
+#####################################################
 
 # Script by Eva L
 # started 2023-01-16
@@ -10,14 +10,14 @@ library(vegan) # gradient analysis
 library(graphics)  # identify points on ordination diagrams
 library(plotly)} # for 3D plotting
 
-# 1. precipitation
-# 2. climatic predictors
-# 3. sla, height, leaf area
-# 4. co-occurrences
+# 1. species scores
+# 2. sla, height, leaf area
+# 3. co-occurrences
 
 # read data
 setwd('C:/Users/evaler/OneDrive - Universitetet i Oslo/Eva/PHD/hmsc_incline/src/analysis/')
-mds <- readRDS('../../results/models/mds_k3.Rds') # ordination with k = 3 (three-dimensional solution)
+  # global ordination with k = 3 (three-dimensional solution)
+mds <- readRDS('../../results/models/mds_k3.Rds') 
 
 gnmds3_1 <- readRDS('../../results/models/gnmds3_1.Rds') # axis 1
 gnmds3_2 <- readRDS('../../results/models/gnmds3_2.Rds')
@@ -29,6 +29,15 @@ mds3var <- readRDS('../../results/models/k3_mds3var.Rds')
 
 ord_df <- readRDS('../../data_processed/ord_df.Rds') # data frame with ordination axes and species occurrences; to be modified further down
 ord_df[1:5,1:10]
+
+  # site-specific
+mds_axes_long <- read.csv("../../results/models/gnmds_axes_k2_sitespecific.csv")
+mds_axes_wide <- read.csv("../../results/models/gnmds_axes_k2_sitespecific_wide.csv")
+
+ord_df_skj <- read.csv("../../data_processed/ord_df_skj.csv")
+ord_df_ulv <- read.csv("../../data_processed/ord_df_ulv.csv")
+ord_df_lav <- read.csv("../../data_processed/ord_df_lav.csv")
+ord_df_gud <- read.csv("../../data_processed/ord_df_gud.csv")
 
 # 1. PRECIPITATION LEVELS
 # -----------------------------------
@@ -66,42 +75,41 @@ plot_ly(x = ord_df$mds1,
         type="scatter3d", 
         mode="markers",
         size = 3) 
+  # sites clearly separate, but not according to precipitation level.
 
-# 2. MICROCLIMATIC PREDICTORS
+# 2. SOIL MOISTURE
 # ------------------------------
 # other climatic variables might be more important than precipitation.
+# check soil moisture and other microclimatic records
 # See microclimate_formatting.R for data download and handling.
-ord_df2 <- readRDS('../../data_processed/ord_df2.Rds')
-ord_df2[1:5,1:10]
+ord_df_clim <- readRDS('../../data_processed/ord_df_clim.Rds')
+ord_df_clim[1:5,1:10]
 
-# check correlations between axes and ...
-  # soil moisture
-cor.test(ord_df2$mds1,ord_df2$soil_mst_mean,method="k") # tau=0.266   p<2.2e-16
-cor.test(ord_df2$mds2,ord_df2$soil_mst_mean,method="k") # tau=-0.0270 p<2.2e-16
-cor.test(ord_df2$mds3,ord_df2$soil_mst_mean,method="k") # tau=-0.227  p<2.2e-16
+# check correlations between axes and soil moisture
+  # global
+cor.test(ord_df_clim$mds1,ord_df_clim$soil_mst_mean,method="k") # tau=0.266   p<2.2e-16
+cor.test(ord_df_clim$mds2,ord_df_clim$soil_mst_mean,method="k") # tau=-0.0270 p<2.2e-16
+cor.test(ord_df_clim$mds3,ord_df_clim$soil_mst_mean,method="k") # tau=-0.227  p<2.2e-16
 {par(mfrow=c(1,2))
-plot(ord_df2$mds1,ord_df2$soil_mst_mean)
-plot(ord_df2$mds3,ord_df2$soil_mst_mean)}
-  # air temperature
+plot(ord_df_clim$mds1,ord_df_clim$soil_mst_mean)
+plot(ord_df_clim$mds3,ord_df_clim$soil_mst_mean)}
 
-  # ground temperature
-
-  # soil temperature
+  # site-specific
 
 # calculate envfit vectors
-ord_df2_soilmst <- subset(ord_df2, !is.na(ord_df2$soil_mst_mean))
-(v_sm_12 <- envfit(ord_df2_soilmst[,c('mds1','mds2')], # ordination space
-                       ord_df2_soilmst$soil_mst_mean, # environmental variable
+ord_df_clim_soilmst <- subset(ord_df_clim, !is.na(ord_df_clim$soil_mst_mean))
+(v_sm_12 <- envfit(ord_df_clim_soilmst[,c('mds1','mds2')], # ordination space
+                       ord_df_clim_soilmst$soil_mst_mean, # environmental variable
                        permutations = 999))
-(v_sm_13 <- envfit(ord_df2_soilmst[,c('mds1','mds3')], # ordination space
-                   ord_df2_soilmst$soil_mst_mean, # environmental variable
+(v_sm_13 <- envfit(ord_df_clim_soilmst[,c('mds1','mds3')], # ordination space
+                   ord_df_clim_soilmst$soil_mst_mean, # environmental variable
                    permutations = 999))
-ord_df2_soiltmp <- # ... 
+ord_df_clim_soiltmp <- # ... 
 
 v_sm_12 <- as.data.frame(scores(v_sm_12, display = "vectors"))
 # v_sm_13 <- as.data.frame(scores(v_sm_12, display = "vectors"))
 
-plot_12 <- ggplot(ord_df2, 
+plot_12 <- ggplot(ord_df_clim, 
                   aes(x = mds1, y = mds2, colour = Site)) + 
   coord_equal() +
   geom_point(size = 1, alpha = 0.3) +
@@ -111,7 +119,7 @@ plot_12 <- ggplot(ord_df2,
                arrow = arrow(), colour = 'black') +
   theme_classic()
 
-plot_13 <- ggplot(ord_df2, 
+plot_13 <- ggplot(ord_df_clim, 
                   aes(x = mds1, y = mds3, colour = Site)) + 
   coord_equal() +
   geom_point(size = 1, alpha = 0.3) +
