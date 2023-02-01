@@ -94,34 +94,25 @@ for (site in names(ord_df_list)) {
     match("mds2", names(ord_df_list[[site]])),
     match("Ach_mil", names(ord_df_list[[site]])):ncol(ord_df_list[[site]])
   )]
+  ord_df_list[[site]] <-
+    ord_df_list[[site]][, c(1:(ncol(ord_df_list[[site]]) - 2))]
 }
 
 # for each site in the ordination df list, create a new variable 
 # by calculating the species' average plot score per axis as
 # the product of the species presences and the plot scores for an ordination axis,
 # and divide this by the number of presences
-
+species_scores = list()
 for (site in names(ord_df_list)) {
   print(site)
   startcolumn = match("Ach_mil", names(ord_df_list[[site]]))
+  print(startcolumn)
   stopcolumn = ncol(ord_df_list[[site]])
-  tmp[[site]] <- apply(ord_df_list[[site]][, startcolumn:stopcolumn],
-               2,
-               function(x)
-                 sum(x * flatten(ord_df_list[[site]]$mds1) / sum(x)))
+  print(stopcolumn)
+  axis1 = unlist(ord_df_list[[site]]$mds1)
+  species_scores[[site]] <-
+    apply(ord_df_list[[site]][, startcolumn:stopcolumn],
+          2,
+          function(x)
+            sum(x * axis1 / sum(x)))
 }
-temp = as.numeric(ord_df_list[["lav"]]$mds1)
-apply(ord_df_list[["lav"]][, startcolumn:stopcolumn],
-      2,
-      function(x)
-        sum(x * temp / sum(x)))
-
-apply(ord_df_list[["lav"]][, startcolumn:stopcolumn],
-      2,
-      function(x)
-        sum(x * as.numeric(ord_df_list[["lav"]]$mds1) / sum(x)))
-
-mds3var <-
-  apply(ord_df[, match("Ach_mil", names(ord_df)):ncol(ord_df)], 2,
-        function(x)
-          sum(x * ord_df$mds3) / sum(x))
