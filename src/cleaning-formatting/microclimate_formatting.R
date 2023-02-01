@@ -188,7 +188,7 @@ plot_means_at <- as.data.frame(plot_means_at)
 # join new microclimate columns to ordination data frame
 codes = c('plot_means_sm','plot_means_at')#,'plot_means_gt','plot_means_st')
 for (i in 1:length(codes)) {
-  ord_df2 <- merge(x = ord_df,
+  ord_df_clim <- merge(x = ord_df,
                  all.x = TRUE,
                  y = codes[i],
                  by.x = 'plotID',
@@ -196,16 +196,16 @@ for (i in 1:length(codes)) {
 } # Error in fix.by(by.y, y) : 'by' must specify a uniquely valid column
 
 
-ord_df2 <- merge(x = ord_df,
+ord_df_clim <- merge(x = ord_df,
                  all.x = TRUE,
                  y = plot_means_,
                  by = 'plotID')
 
 # reorder columns
-ord_df2 <- ord_df2 %>% 
+ord_df_clim <- ord_df_clim %>% 
   select(Site,prec,blockID,plotID,subPlotID:mds3,
          soil_mst_mean, everything())
 
-saveRDS(ord_df2,'../../data_processed/ord_df2.Rds')
+saveRDS(ord_df_clim,'../../data_processed/ord_df_clim.Rds')
 
 
