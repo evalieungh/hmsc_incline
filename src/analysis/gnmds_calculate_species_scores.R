@@ -77,7 +77,7 @@ ord_df_list = list(
   gud = ord_df_gud
 )
 
-# add ordinatior axes to site-specific data frames
+# add ordination axes to site-specific data frames
 for (site in names(ord_df_list)) {
   print(site)
   mds1 = as.data.frame(na.omit(mds_axes_wide[, paste(site, "_1", sep = "")]))
@@ -86,7 +86,7 @@ for (site in names(ord_df_list)) {
   ord_df_list[[site]]$mds2 <- flatten(mds2)
 }
 
-# reorder columns to get site, gnmds, etc first, then species columns
+# reorder columns to get site, gnmds axes, etc first, then species columns
 for (site in names(ord_df_list)) {
   ord_df_list[[site]] <- ord_df_list[[site]][, c(
     1:5,
@@ -98,21 +98,48 @@ for (site in names(ord_df_list)) {
     ord_df_list[[site]][, c(1:(ncol(ord_df_list[[site]]) - 2))]
 }
 
+saveRDS(ord_df_list,"../../data_processed/ordination_df_sitespecific_list.Rds")
+
 # for each site in the ordination df list, create a new variable 
 # by calculating the species' average plot score per axis as
 # the product of the species presences and the plot scores for an ordination axis,
 # and divide this by the number of presences
+# species_scores = list()
+# for (site in names(ord_df_list)) {
+#   print("calculating for site:", site)
+#   startcolumn = match("Ach_mil", names(ord_df_list[[site]]))
+#   print("first species col:", startcolumn)
+#   stopcolumn = ncol(ord_df_list[[site]])
+#   print("last species col:", stopcolumn)
+#   axis1 = unlist(ord_df_list[[site]]$mds1)
+#   species_scores[[site]] <-
+#     apply(ord_df_list[[site]][, startcolumn:stopcolumn],
+#           2,
+#           function(x)
+#             sum(x * axis1 / sum(x)))
+# }
+
 species_scores = list()
 for (site in names(ord_df_list)) {
-  print(site)
+  print(paste("calculating for site:", site))
   startcolumn = match("Ach_mil", names(ord_df_list[[site]]))
-  print(startcolumn)
+  print(paste("first species col:", startcolumn))
   stopcolumn = ncol(ord_df_list[[site]])
-  print(stopcolumn)
+  print(paste("last species col:", stopcolumn))
   axis1 = unlist(ord_df_list[[site]]$mds1)
-  species_scores[[site]] <-
+  axis2 = unlist(ord_df_list[[site]]$mds2)
+  species_scores[[site]]$mds1 <-
     apply(ord_df_list[[site]][, startcolumn:stopcolumn],
           2,
           function(x)
             sum(x * axis1 / sum(x)))
+  species_scores[[site]]$mds2 <-
+    apply(ord_df_list[[site]][, startcolumn:stopcolumn],
+          2,
+          function(x)
+            sum(x * axis2 / sum(x)))
 }
+
+saveRDS(species_scores,"../../results/gnmds_k2_species_scores_sitespecific.Rds")
+
+# further analyses and plotting in other scripts!
