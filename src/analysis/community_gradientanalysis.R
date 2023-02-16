@@ -491,6 +491,7 @@ for (i in 1:100) {
     sfgrmin = 1e-7
   )
 } # The mds object is now a list consisting of 100 "sub-objects" which themselves are lists.
+
 # site-specific
 for (i in 1:100) {
   mds_skj[[i]] <- monoMDS(

@@ -1,8 +1,17 @@
+###################
+#  Define models  #
+###################
+
+# script by Otso Ovaskainen, Hmsc developers, Eva Lieungh
+# started 2022-04-26
+
 setwd("U:/all stuff/manuscripts/InPreparation/Eva Lieungh alpine plants")
 library(Hmsc)
 
 da = read.csv("data/SXY.csv")
 n = dim(da)[1]
+
+# create representation of spatial study design of subplots
 sub.plot.number = rep(NA,n)
 for(i in 1:n){
   tmp = da$subPlotID[i]
@@ -27,12 +36,14 @@ rownames(xy) = studyDesign$subplot
 head(xy)
 plot(xy[,1],xy[,2],xlim = c(0,300))
 
+# set study design as random levels
 rL.site = HmscRandomLevel(units = levels(studyDesign$site))
 rL.block = HmscRandomLevel(units = levels(studyDesign$block))
 rL.plot = HmscRandomLevel(units = levels(studyDesign$plot))
 rL.subplot = HmscRandomLevel(units = levels(studyDesign$subplot))
 #rL.subplot = HmscRandomLevel(sData = xy,sMethod = "NNGP",nNeighbours = 28)
 
+# define global model
 m = Hmsc(Y=Y,
          XFormula = ~1,XData = XData,
          distr = "probit",
@@ -45,6 +56,7 @@ m = Hmsc(Y=Y,
 models = list(m)
 modelnames = c("global")
 
+# define site-specific models
 sites = levels(studyDesign$site)
 for(i in 1:length(sites)){
   sel = which(studyDesign$site==(sites[i]))
@@ -63,6 +75,7 @@ for(i in 1:length(sites)){
   models[[i+1]] = m
   modelnames = c(modelnames,sites[i])
 }
+
 for(i in 1:length(models)){
   print(modelnames[i])
   sampleMcmc(models[[i]],samples = 2)
