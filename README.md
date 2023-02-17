@@ -27,3 +27,5 @@ More info to come...
 PhD project funded by the Norwegian Ministry of Education and Research, through the Natural History Museum, University of Oslo.
 
 ### Sharing and access
+
+This code will have a permissive license (likely MIT). Copy snippets freely, but please refer to this repository if you use large parts of several scripts (that is, if you are doing most of the same analyses and your starting point is a copy of these scripts). 
