@@ -552,16 +552,16 @@ for (i in 1:100) {
 
 # save/overwrite or load mds object
 saveRDS(mds, "../../results/models/mds_k3.Rds")
-saveRDS(mds_skj, "../../results/models/mds_k3_skj.Rds")
-saveRDS(mds_ulv, "../../results/models/mds_k3_ulv.Rds")
-saveRDS(mds_lav, "../../results/models/mds_k3_lav.Rds")
-saveRDS(mds_gud, "../../results/models/mds_k3_gud.Rds")
+saveRDS(mds_skj, "../../results/models/mds_k2_skj.Rds")
+saveRDS(mds_ulv, "../../results/models/mds_k2_ulv.Rds")
+saveRDS(mds_lav, "../../results/models/mds_k2_lav.Rds")
+saveRDS(mds_gud, "../../results/models/mds_k2_gud.Rds")
 
 mds <- readRDS("../../results/models/mds_k3.Rds")
-mds_skj <- readRDS("../../results/models/mds_k3_skj.Rds")
-mds_ulv <- readRDS("../../results/models/mds_k3_ulv.Rds")
-mds_lav <- readRDS("../../results/models/mds_k3_lav.Rds")
-mds_gud <- readRDS("../../results/models/mds_k3_gud.Rds")
+mds_skj <- readRDS("../../results/models/mds_k2_skj.Rds")
+mds_ulv <- readRDS("../../results/models/mds_k2_ulv.Rds")
+mds_lav <- readRDS("../../results/models/mds_k2_lav.Rds")
+mds_gud <- readRDS("../../results/models/mds_k2_gud.Rds")
 
 # Extract the stress values as a vector.
 # Stress values are provided by the 22th element in each "subobject list"
