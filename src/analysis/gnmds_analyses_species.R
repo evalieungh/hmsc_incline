@@ -33,6 +33,16 @@ species_scores_global <- data.frame(mds1var = mds1var,
 ord_df <- readRDS('../../data_processed/ord_df.Rds') # data frame with ordination axes and species occurrences; to be modified further down
 ord_df[1:5,1:10]
 
+# add column with number of occurrences in each subplot
+ord_df$occurrences <-
+  apply(ord_df[, which(colnames(ord_df) == "Ach_mil"):ncol(ord_df)],
+        1,
+        function(x)
+          sum(x))
+
+mean(ord_df$occurrences)
+median(ord_df$occurrences)
+
   # site-specific
 # mds_axes_long <- read.csv("../../results/models/gnmds_axes_k2_sitespecific.csv")
 # mds_axes_wide <- read.csv("../../results/models/gnmds_axes_k2_sitespecific_wide.csv")
@@ -56,6 +66,15 @@ for (site in sites) {
   species_scores_list[[site]]$mds2 <-
     sapply(species_scores_list[[site]]$mds2, function(x)
       replace(x, is.nan(x), NA))
+}
+
+# add columns with occurrence sums per subplot
+for (site in sites) {
+  ord_df_list[[site]]$occurrences <-
+    apply(ord_df_list[[site]][,which(colnames(ord_df_list[[site]]) == "Ach_mil"):ncol(ord_df_list[[site]])],
+                                                                                      1,
+                                                                                      function(x)
+                                                                                        sum(x))
 }
 
 # SPECIES SCORES
@@ -120,8 +139,12 @@ for (site in sites) {
       x = "gnmds axis 1",
       y = "gnmds axis 2"
     ) +
-    geom_point(colour = "grey",
+    geom_point(aes(colour = ord_df_list[[site]]$occurrences),
                size = 1) +
+    scale_colour_gradient(
+      low = "yellow",
+      high = "red"
+    ) +
     ggrepel::geom_text_repel(
       data = sitespecific_df,
       mapping = aes(x = mds1,
@@ -141,6 +164,18 @@ for (site in sites) {
          scale = 2)
 }
 
+
+# Add to plot: vectors for occurrences
+mds1_column_number = as.double(which(colnames(ord_df_list[["lav"]]) == "mds1"))
+mds2_column_number = as.double(which(colnames(ord_df_list[["lav"]]) == "mds2"))
+occurrencesum_column_number = as.double(which(colnames(ord_df_list[["lav"]]) == "occurrences"))
+
+
+
+occurrence_vector <-
+  envfit(ord = data.frame(ord_df_list[["lav"]][, mds1_column_number:mds2_column_number]), # mds1 and mds2 column indexes
+         env = ord_df_list[["lav"]][, occurrencesum_column_number], # occurrence column
+         permutations = 999)
 
 
 # 3. SLA, HEIGHT, LEAF AREA

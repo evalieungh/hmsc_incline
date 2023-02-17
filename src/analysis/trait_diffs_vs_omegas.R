@@ -29,4 +29,5 @@ unique(traits$species)
 species = unique(omegas_long$speciesA[omegas_long$speciesA %in% traits$species])
 species
 
+
 # 
