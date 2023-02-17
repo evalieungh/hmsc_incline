@@ -142,4 +142,20 @@ for (site in names(ord_df_list)) {
 
 saveRDS(species_scores,"../../results/gnmds_k2_species_scores_sitespecific.Rds")
 
+# change NaN to NA
+species_scores_list <- readRDS("../../results/gnmds_k2_species_scores_sitespecific.Rds")
+
+sites = c("skj", "ulv", "lav", "gud")
+
+for (site in sites) {
+  species_scores_list[[site]]$mds1 <-
+    sapply(species_scores_list[[site]]$mds1, function(x)
+      replace(x, is.nan(x), NA))
+  species_scores_list[[site]]$mds2 <-
+    sapply(species_scores_list[[site]]$mds2, function(x)
+      replace(x, is.nan(x), NA))
+}
+
+saveRDS(species_scores_list,"../../results/gnmds_k2_species_scores_sitespecific.Rds")
+
 # further analyses and plotting in other scripts!
