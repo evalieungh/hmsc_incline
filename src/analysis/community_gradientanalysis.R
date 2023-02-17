@@ -714,12 +714,21 @@ plot(procrustes(mds.best, mds.2best, permutations = 999))
        main = "gud")
 }
 
+# save best mds objects (site-specific only, global to be added)
+mds_best_list = list(gud = mds.best.gud, 
+                     lav = mds.best.lav, 
+                     skj = mds.best.skj, 
+                     ulv = mds.best.ulv)
+for (i in 1:4) {
+  saveRDS(mds_best_list[[i]],paste("../../results/models/mds_best_",names(mds_best_list[i]),".Rds", sep = ""))
+}
+
 # extract axes from lowest-stress mds
 # global
 # # k = 2
 #  gnmds2_1 <- mds.best$points[,1]
 #  gnmds2_2 <- mds.best$points[,2]
-# k = 3
+ # k = 3
 gnmds3_1 <- mds.best$points[, 1]
 gnmds3_2 <- mds.best$points[, 2]
 gnmds3_3 <- mds.best$points[, 3]

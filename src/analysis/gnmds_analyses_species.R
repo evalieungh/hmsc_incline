@@ -10,9 +10,15 @@ library(vegan) # gradient analysis
 library(graphics)  # identify points on ordination diagrams
 library(plotly)} # for 3D plotting
 
-# 1. species scores
-# 2. sla, height, leaf area
-# 3. co-occurrences
+# 1. species scores global
+# 2. species scores vs number of species in subplot
+# 3. sla, height, leaf area
+
+# This script...
+# formats data a bit, 
+# plots plot and species scores
+# with occurrence sums and envfit vector
+# (...)
 
 # read data
 setwd('C:/Users/evaler/OneDrive - Universitetet i Oslo/Eva/PHD/hmsc_incline/src/analysis/')
@@ -20,62 +26,26 @@ setwd('C:/Users/evaler/OneDrive - Universitetet i Oslo/Eva/PHD/hmsc_incline/src/
 mds <- readRDS('../../results/models/mds_k3.Rds') 
 
 gnmds3_1 <- readRDS('../../results/models/gnmds3_1.Rds') # axis 1
-gnmds3_2 <- readRDS('../../results/models/gnmds3_2.Rds')
+gnmds3_2 <- readRDS('../../results/models/gnmds3_2.Rds') # axis 2
 gnmds3_3 <- readRDS('../../results/models/gnmds3_3.Rds')
 
-mds1var <- readRDS('../../results/models/k3_mds1var.Rds') # species scores for axis 1
-mds2var <- readRDS('../../results/models/k3_mds2var.Rds')
-mds3var <- readRDS('../../results/models/k3_mds3var.Rds')
-species_scores_global <- data.frame(mds1var = mds1var,
-                                    mds2var = mds2var,
-                                    mds3var = mds3var)
+species_scores_global <- data.frame(mds1var = readRDS('../../results/models/k3_mds1var.Rds'), # species scores for axis 1
+                                    mds2var = readRDS('../../results/models/k3_mds2var.Rds'), # species scores for axis 2
+                                    mds3var = readRDS('../../results/models/k3_mds3var.Rds'))
 
 ord_df <- readRDS('../../data_processed/ord_df.Rds') # data frame with ordination axes and species occurrences; to be modified further down
 ord_df[1:5,1:10]
 
-# add column with number of occurrences in each subplot
-ord_df$occurrences <-
-  apply(ord_df[, which(colnames(ord_df) == "Ach_mil"):ncol(ord_df)],
-        1,
-        function(x)
-          sum(x))
-
-mean(ord_df$occurrences)
-median(ord_df$occurrences)
-
   # site-specific
-# mds_axes_long <- read.csv("../../results/models/gnmds_axes_k2_sitespecific.csv")
-# mds_axes_wide <- read.csv("../../results/models/gnmds_axes_k2_sitespecific_wide.csv")
-
-# ord_df_skj <- read.csv("../../data_processed/ord_df_skj.csv")
-# ord_df_ulv <- read.csv("../../data_processed/ord_df_ulv.csv")
-# ord_df_lav <- read.csv("../../data_processed/ord_df_lav.csv")
-# ord_df_gud <- read.csv("../../data_processed/ord_df_gud.csv")
-
 ord_df_list <- readRDS("../../data_processed/ordination_df_sitespecific_list.Rds")
 
 species_scores_list <- readRDS("../../results/gnmds_k2_species_scores_sitespecific.Rds")
 
+occurrence_vector_list <- readRDS("../../data_processed/occurrence_sums_sitespecific_vector_list.Rds")
+
 sites = c("skj", "ulv", "lav", "gud")
 
-# change NaN to NA
-for (site in sites) {
-  species_scores_list[[site]]$mds1 <-
-    sapply(species_scores_list[[site]]$mds1, function(x)
-      replace(x, is.nan(x), NA))
-  species_scores_list[[site]]$mds2 <-
-    sapply(species_scores_list[[site]]$mds2, function(x)
-      replace(x, is.nan(x), NA))
-}
 
-# add columns with occurrence sums per subplot
-for (site in sites) {
-  ord_df_list[[site]]$occurrences <-
-    apply(ord_df_list[[site]][,which(colnames(ord_df_list[[site]]) == "Ach_mil"):ncol(ord_df_list[[site]])],
-                                                                                      1,
-                                                                                      function(x)
-                                                                                        sum(x))
-}
 
 # SPECIES SCORES
 # ------------------------------
@@ -128,31 +98,58 @@ for (site in sites) {
   print(paste("plotting for site:", site))
   sitespecific_df = as.data.frame(species_scores_list[[site]])
   speciesnames = rownames(sitespecific_df)
+  vector_df = as.data.frame(scores(occurrence_vector_list[[site]], display = "vectors"))
+  # start plotting
   plot_list[[site]] <-
     ggplot(ord_df_list[[site]],
            aes(
              x = unlist(ord_df_list[[site]]$mds1),
              y = unlist(ord_df_list[[site]]$mds2)
            )) +
+    # add labels
     labs(
       title = paste("GNMDS relative species scores:", toupper(site)),
       x = "gnmds axis 1",
-      y = "gnmds axis 2"
+      y = "gnmds axis 2",
+      colour = "number of species\n present in subplot",
+      caption = paste("Blue arrow: envfit vector of number of species per subplot, r = ",
+                      round(occurrence_vector_list[[site]]$vectors$r, digits = 2))
     ) +
+    # add site scores for subplots, 
+    # colour them by sum of occurrences
     geom_point(aes(colour = ord_df_list[[site]]$occurrences),
                size = 1) +
     scale_colour_gradient(
       low = "yellow",
       high = "red"
     ) +
+    # add species labels
     ggrepel::geom_text_repel(
       data = sitespecific_df,
       mapping = aes(x = mds1,
                     y = mds2),
       label = speciesnames
-    ) +
+    ) + 
+    # add vector
+    geom_segment(data = vector_df,
+                 aes(x = 0, xend = vector_df$MDS1,
+                     y = 0, yend = vector_df$MDS2),
+                 arrow = arrow(length = unit(0.5, "mm",),
+                               type = "closed"), 
+                 colour = "blue",
+                 size = 1.5) +
+    # # add label to vector
+    # geom_text(aes(x = vector_df$MDS1,
+    #               y = vector_df$MDS2,
+    #               label = round(occurrence_vector_list[[site]]$vectors$r, digits = 2)),
+    #           colour = "blue",
+    #           fill = "white",
+    #           size = 4) +
+    coord_fixed() +
     theme_minimal()
-  #print(plot_list[[site]])
+  # print/show the plot in R
+  # print(plot_list[[site]])
+  # save the plot
   ggsave(filename = paste("species_plot_", site, ".png", sep=""),
          plot = plot_list[[site]],
          path = "../../results/figures/",
@@ -165,20 +162,7 @@ for (site in sites) {
 }
 
 
-# Add to plot: vectors for occurrences
-mds1_column_number = as.double(which(colnames(ord_df_list[["lav"]]) == "mds1"))
-mds2_column_number = as.double(which(colnames(ord_df_list[["lav"]]) == "mds2"))
-occurrencesum_column_number = as.double(which(colnames(ord_df_list[["lav"]]) == "occurrences"))
-
-
-
-occurrence_vector <-
-  envfit(ord = data.frame(ord_df_list[["lav"]][, mds1_column_number:mds2_column_number]), # mds1 and mds2 column indexes
-         env = ord_df_list[["lav"]][, occurrencesum_column_number], # occurrence column
-         permutations = 999)
-
-
-# 3. SLA, HEIGHT, LEAF AREA
+# 3. SLA, HEIGHT, LEAF AREA - NB needs updating!
 # ------------------------------
 # compare measured traits to species scores
 
