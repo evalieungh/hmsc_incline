@@ -33,6 +33,7 @@ SXY <- SXY %>%
     )
   )))
 
+# reorder columns
 SXY <- SXY %>%
   select(Site:subPlotID,prec,Ach_mil:Vio_sp)
 SXY[1:5,1:10]
@@ -48,11 +49,13 @@ Y <- Y[,-remove_pa] # remove those species
 colnames(Y)[grepl('_cf',colnames(Y))] # check for uncertain species
 colnames(Y)[grepl('_sp',colnames(Y))] # check for genus-level records. Include of exclude?
 
-species <- c(names(Y)) # final list of species to include (pick up to make phylo tree and traits df)
-SXY <- data.frame(SXY[,1:5],Y) # save SXY with the correct species
-
-# export species list
+# final list of species to include
+species <- c(names(Y))
 write.csv(species,'Data/specieslist.csv',row.names = FALSE)
+
+# save SXY with the correct species
+SXY <- data.frame(SXY[,1:5],Y) 
+
 
 # Microclimatic covariates (x)
 #------------------------------------------
