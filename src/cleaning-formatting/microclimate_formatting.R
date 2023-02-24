@@ -17,6 +17,7 @@
 
 { # read libraries
 library(tidyverse)# piping, formatting
+library(dplyr) # group_by, summarise, joins
 library(lubridate) # date & time handling
 library(timetk) # time series plotting
 library(ggplot2) # nicer plotting
@@ -26,13 +27,14 @@ library(data.table) # to subset multiple date ranges effectively
 
 # read data
 setwd('C:/Users/evaler/OneDrive - Universitetet i Oslo/Eva/PHD/hmsc_incline/src/analysis/')
+
 soil_mst <- read.csv(
   '../../data/VCG/INCLINE_microclimate/data_cleaned
   /INCLINE_microclimate_soil_moisture.csv')
 air_tmp <- read.csv(
   '../../data/VCG/INCLINE_microclimate/data_cleaned/INCLINE_microclimate_air_temperature.csv')
 grnd_tmp <- read.csv(
-  '../../data/VCG/INCLINE_microclimate/data_cleane/INCLINE_microclimate_ground_temperature.csv')
+  '../../data/VCG/INCLINE_microclimate/data_cleaned/INCLINE_microclimate_ground_temperature.csv')
 soil_tmp <- read.csv(
   '../../data/VCG/INCLINE_microclimate/data_cleaned/INCLINE_microclimate_soil_temperature.csv')
 
@@ -49,16 +51,32 @@ soil_mst <- soil_mst %>% # Add date and hour as new columns
              hr = hour(soil_mst$datetime), 
              .before = 'loggerID')
   # 1.2. air temnperature
-air_tmp$datetime <- ymd_hms(air_tmp$datetime) # convert to time format POSIXct, yyyy-mm-dd hh:mm:ss
-air_tmp$loggerID <- as.factor(air_tmp$loggerID) # convert from integer to factor
-which(grepl("^\\s*$", air_tmp$plotID)==TRUE) # search for whitespaces that might mess up further stuff
-air_tmp <- air_tmp[air_tmp$OTC != 'W',] # remove warmed plots (OTC=open-top chamber)
-air_tmp <- air_tmp %>% # Add date and hour as new columns
+air_tmp$datetime <- ymd_hms(air_tmp$datetime) 
+air_tmp$loggerID <- as.factor(air_tmp$loggerID) 
+which(grepl("^\\s*$", air_tmp$plotID)==TRUE)
+air_tmp <- air_tmp[air_tmp$OTC != 'W',] 
+air_tmp <- air_tmp %>%
   add_column(date = date(air_tmp$datetime),
              hr = hour(air_tmp$datetime), 
              .before = 'loggerID')
   # 1.3. ground temperature
+grnd_tmp$datetime <- ymd_hms(grnd_tmp$datetime) 
+grnd_tmp$loggerID <- as.factor(grnd_tmp$loggerID) 
+which(grepl("^\\s*$", grnd_tmp$plotID)==TRUE)
+grnd_tmp <- grnd_tmp[grnd_tmp$OTC != 'W',] 
+grnd_tmp <- grnd_tmp %>%
+  add_column(date = date(grnd_tmp$datetime),
+             hr = hour(grnd_tmp$datetime), 
+             .before = 'loggerID')
   # 1.4. soil temperature
+soil_tmp$datetime <- ymd_hms(soil_tmp$datetime) 
+soil_tmp$loggerID <- as.factor(soil_tmp$loggerID) 
+which(grepl("^\\s*$", soil_tmp$plotID)==TRUE)
+soil_tmp <- soil_tmp[soil_tmp$OTC != 'W',] 
+soil_tmp <- soil_tmp %>%
+  add_column(date = date(soil_tmp$datetime),
+             hr = hour(soil_tmp$datetime), 
+             .before = 'loggerID')
 
 # inspect data
   # 1.1. soil moisture
@@ -66,8 +84,8 @@ unique(year(soil_mst$datetime)) # 2019-2021
 length(unique(soil_mst$loggerID)) # 63 loggers outside OTCs
 soil_mst$datetime[1:50] # logging every 15 mins
   # 1.2. air temnperature = same as above
-  # 1.3. ground temperature
-  # 1.4. soil temperature
+  # 1.3. ground temperature = same as above
+  # 1.4. soil temperature = same as above
 
 # get hourly averages per plot
   # 1.1. soil moisture
@@ -81,7 +99,15 @@ air_tmp2 <- air_tmp %>%
   summarise(air_tmp_h = mean(air_temperature)) # get mean soil moisture per hour
 air_tmp2 <- as.data.frame(air_tmp2)
   # 1.3. ground temperature
+grnd_tmp2 <- grnd_tmp %>%
+  group_by(plotID, date, hr) %>% # group by plot and interval
+  summarise(grnd_tmp_h = mean(ground_temperature)) # get mean soil moisture per hour
+grnd_tmp2 <- as.data.frame(grnd_tmp2)
   # 1.4. soil temperature
+soil_tmp2 <- soil_tmp %>%
+  group_by(plotID, date, hr) %>% # group by plot and interval
+  summarise(soil_tmp_h = mean(soil_temperature)) # get mean soil moisture per hour
+soil_tmp2 <- as.data.frame(soil_tmp2)
 
 # now add back some columns from the original data frame. 
   # 1.1. soil moisture
@@ -94,13 +120,23 @@ soil_mst <- soil_mst %>% distinct() # remove duplicates
 air_tmp <- left_join(air_tmp2,
                      air_tmp[,c('plotID','date', 'hr','siteID','loggerID','treatment')],
                       by = c('plotID', 'date', 'hr'))
-duplicated(air_tmp[1:50,]) # not sure why but the join adds duplicated rows (i.e. keeps all the rows in y)
-air_tmp <- air_tmp %>% distinct() # remove duplicates
+duplicated(air_tmp[1:50,])
+air_tmp <- air_tmp %>% distinct()
   # 1.3. ground temperature
+grnd_tmp <- left_join(grnd_tmp2,
+                      grnd_tmp[,c('plotID','date', 'hr','siteID','loggerID','treatment')],
+                      by = c('plotID', 'date', 'hr'))
+duplicated(grnd_tmp[1:50,])
+grnd_tmp <- grnd_tmp %>% distinct()
   # 1.4. soil temperature
+soil_tmp <- left_join(soil_tmp2,
+                      soil_tmp[,c('plotID','date', 'hr','siteID','loggerID','treatment')],
+                      by = c('plotID', 'date', 'hr'))
+duplicated(soil_tmp[1:50,])
+soil_tmp <- soil_tmp %>% distinct()
 
 # remove intermediate objects from R environment
-remove(soil_mst2, air_tmp2) 
+remove(soil_mst2, air_tmp2, grnd_tmp2, soil_tmp2) 
 
 # save modified data 
   # 1.1 soil moisture
@@ -108,10 +144,22 @@ saveRDS(soil_mst,'../../data_processed/soil_moisture_hourly_noOTC.Rds')
   # 1.2. air temnperature
 saveRDS(air_tmp,'../../data_processed/air_temperature_hourly_noOTC.Rds')
   # 1.3. ground temperature
+saveRDS(grnd_tmp,'../../data_processed/ground_temperature_hourly_noOTC.Rds')
   # 1.4. soil temperature
+saveRDS(soil_tmp,'../../data_processed/soil_temperature_hourly_noOTC.Rds')
 
-# the community data is from 2018, but we only have soil moisture data from 2019. There are many species in this community that die back completely above ground each year, but overwinter as roots. Which individuals grow back might vary from year to year depending on that season's weather... But species survival and community composition overall depends on more general climate and variability over several years.
-# Let's use the whole range to start with.
+# the community data is from 2018, but we only have microclimate data from 2019. 
+# There are many species in this community that die back completely above ground 
+# each year, but overwinter as roots. Which individuals grow back might vary 
+# from year to year depending on that season's weather... But species survival 
+# and community composition overall depends on more general climate and 
+# variability over several years.
+# Let's use the whole range to start with, to get closer to climate than weather.
+
+# which temperature data should I proceed with? Environmental covariates should
+# not be strongly correlated, but air/ground/soil temp obviously are. Which one
+# is most ecologically relevant, captures the most variation, or shows small- 
+# scale variation the best?
 
 # plot to get overview
   # 1.1 soil moisture
@@ -132,7 +180,21 @@ plot_df %>%
   theme_classic()
     # a lot of overlap between plot temperatures.
   # 1.3. ground temperature
+plot_df <- grnd_tmp[grnd_tmp$date >= "2021-06-15", ]
+plot_df <- as_tibble(plot_df[plot_df$siteID == 'Ulvehaugen',])
+plot_df %>%
+  ggplot(aes(x= date, y = grnd_tmp_h, 
+             color = plotID)) +
+  geom_point(size = 0.5, alpha = 0.7) +
+  theme_classic()
   # 1.4. soil temperature
+plot_df <- soil_tmp[soil_tmp$date >= "2021-06-15", ]
+plot_df <- as_tibble(plot_df[plot_df$siteID == 'Ulvehaugen',])
+plot_df %>%
+  ggplot(aes(x= date, y = soil_tmp_h, 
+             color = plotID)) +
+  geom_point(size = 0.5, alpha = 0.7) +
+  theme_classic()
 
 # ridge plot per site
   # 1.1 soil moisture
@@ -141,15 +203,29 @@ soil_mst %>%
     geom_density_ridges() +
     theme_ridges() + 
     theme(legend.position = "none")
-  # ... 
+  # 1.3. ground temperature
+grnd_tmp %>%
+  ggplot(aes(x = date, y = siteID, fill = siteID)) +
+  geom_density_ridges() +
+  theme_ridges() + 
+  theme(legend.position = "none")
+  # 1.4. soil temperature
+soil_tmp %>%
+  ggplot(aes(x = date, y = siteID, fill = siteID)) +
+  geom_density_ridges() +
+  theme_ridges() + 
+  theme(legend.position = "none")
+
 
 # 2. format to match ordination data frame
 # ----------------------------------------------------
-  # the ordination has no use of the time series other than as independent background information. 
-  # the most interesting data is the plot-specific average( or max and/or min?) for the growing season. 
+# formatting for use in hmsc is in S0_format_data_for_hmsc.R
+  # the ordination has no use of the time series other than as independent 
+  # background information. the most interesting data is the plot-specific 
+  # average (or max and/or min?) for the growing season. 
   # This might consist of data from 0, 1 or more loggers!
-  # To get this, I need to subset the growing seasons (assuming june--september), 
-  # group by plot ID
+  # To get this, I need to subset the growing seasons 
+  # (assuming june--september), group by plot ID,
   # and calcualte the mean (or max/min but let's start with mean)
 
 # define growing season date ranges
