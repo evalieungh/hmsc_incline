@@ -13,7 +13,8 @@
 # 1.2. air temperature 
 # 1.2. ground temperature 
 # 1.3. soil temperature 
-# 2. format and merge into ordination data frame
+# 2. calculate growing season mean per plotID
+# 3. format and merge into ordination data frame
 
 { # read libraries
 library(tidyverse)# piping, formatting
@@ -156,11 +157,6 @@ saveRDS(soil_tmp,'../../data_processed/soil_temperature_hourly_noOTC.Rds')
 # variability over several years.
 # Let's use the whole range to start with, to get closer to climate than weather.
 
-# which temperature data should I proceed with? Environmental covariates should
-# not be strongly correlated, but air/ground/soil temp obviously are. Which one
-# is most ecologically relevant, captures the most variation, or shows small- 
-# scale variation the best?
-
 # plot to get overview
   # 1.1 soil moisture
 plot_df <- soil_mst[soil_mst$date >= "2021-06-15", ]
@@ -195,6 +191,7 @@ plot_df %>%
              color = plotID)) +
   geom_point(size = 0.5, alpha = 0.7) +
   theme_classic()
+  # it looks like ground temperature captures within-site variation best. 
 
 # ridge plot per site
   # 1.1 soil moisture
@@ -216,72 +213,126 @@ soil_tmp %>%
   theme_ridges() + 
   theme(legend.position = "none")
 
-
-# 2. format to match ordination data frame
-# ----------------------------------------------------
-# formatting for use in hmsc is in S0_format_data_for_hmsc.R
-  # the ordination has no use of the time series other than as independent 
+# 2. calculate growing season mean per plotID
+# -----------------------------------------------
+ # I have no use of the time series other than as independent 
   # background information. the most interesting data is the plot-specific 
   # average (or max and/or min?) for the growing season. 
   # This might consist of data from 0, 1 or more loggers!
   # To get this, I need to subset the growing seasons 
-  # (assuming june--september), group by plot ID,
-  # and calcualte the mean (or max/min but let's start with mean)
+  # (assuming june--september), group by plotID,
+  # calculate the mean (or max/min but let's start with mean),
+  # and join the means to data frame to get one value per subPlotID
 
 # define growing season date ranges
-range <- data.table(start = lubridate::date(c('2019-06-01','2020-06-01','2021-06-01')), 
-                    end = lubridate::date(c('2019-09-30','2020-09-30','2021-09-30')))
+growing_season <-
+  data.table(start = lubridate::date(c('2019-06-01',
+                                       '2020-06-01',
+                                       '2021-06-01')),
+             end = lubridate::date(c('2019-09-30',
+                                     '2020-09-30',
+                                     '2021-09-30')))
 
 # read the data
-ord_df <- readRDS('../../data_processed/ord_df.Rds') # made in community_gradientanalysis.R
-ord_df[1:5,1:10]
-
-soil_mst <- readRDS('../../data_processed/soil_moisture_hourly_noOTC.Rds') # created above
-soil_mst[1:10,]
-
-air_tmp <- readRDS('../../data_processed/air_temperature_hourly_noOTC.Rds')
-air_tmp[1:10,]
-
-
+air_tmp  <- readRDS('../../data_processed/air_temperature_hourly_noOTC.Rds')
+grnd_tmp <- readRDS('../../data_processed/ground_temperature_hourly_noOTC.Rds')
+soil_tmp <- readRDS('../../data_processed/soil_temperature_hourly_noOTC.Rds')
+soil_tmp[1:5,]
+soil_mst <- readRDS('../../data_processed/soil_moisture_hourly_noOTC.Rds')
+soil_mst[1:5,]
 
 # subset only growing season
-soil_mst_sub <- setDT(soil_mst)[date %inrange% range]
-air_tmp_sub <- setDT(air_tmp)[date %inrange% range]
-
+soil_mst_sub <- setDT(soil_mst)[date %inrange% growing_season]
+soil_tmp_sub <- setDT(soil_tmp)[date %inrange% growing_season]
+grnd_tmp_sub <- setDT(grnd_tmp)[date %inrange% growing_season]
+air_tmp_sub  <- setDT(air_tmp)[date %inrange% growing_season]
 
 # calculate means per plot ID
   # soil moisture
-plot_means_sm <- soil_mst_sub %>% # sm for soil moisture
+plot_mean_sm <- soil_mst_sub %>% # sm for soil moisture
   group_by(plotID) %>%
   summarise(soil_mst_mean = mean(na.omit(soil_moisture_h))) 
-plot_means_sm <- as.data.frame(plot_means_sm)
+plot_mean_sm <- as.data.frame(plot_mean_sm)
   # air temp
-plot_means_at <- air_tmp_sub %>%
+plot_mean_at <- air_tmp_sub %>%
   group_by(plotID) %>%
   summarise(air_tmp_mean = mean(na.omit(air_tmp_h))) 
-plot_means_at <- as.data.frame(plot_means_at)
+plot_mean_at <- as.data.frame(plot_mean_at)
+  # ground temp
+plot_mean_gt <- grnd_tmp_sub %>%
+  group_by(plotID) %>%
+  summarise(grnd_tmp_mean = mean(na.omit(grnd_tmp_h))) 
+plot_mean_gt <- as.data.frame(plot_mean_gt)
+  # soil temp
+plot_mean_st <- soil_tmp_sub %>%
+  group_by(plotID) %>%
+  summarise(soil_tmp_mean = mean(na.omit(soil_tmp_h))) 
+plot_mean_st <- as.data.frame(plot_mean_st)
 
-# join new microclimate columns to ordination data frame
-codes = c('plot_means_sm','plot_means_at')#,'plot_means_gt','plot_means_st')
-for (i in 1:length(codes)) {
-  ord_df_clim <- merge(x = ord_df,
-                 all.x = TRUE,
-                 y = codes[i],
-                 by.x = 'plotID',
-                 by.y = 'plotID')
-} # Error in fix.by(by.y, y) : 'by' must specify a uniquely valid column
+# save means
+write.csv(plot_mean_st, "../../data_processed/mean_soil_temp_per_plotID.csv", row.names = FALSE)
+write.csv(plot_mean_gt, "../../data_processed/mean_ground_temp_per_plotID.csv", row.names = FALSE)
+write.csv(plot_mean_at, "../../data_processed/mean_air_temp_per_plotID.csv", row.names = FALSE)
+write.csv(plot_mean_sm, "../../data_processed/mean_soil_moisture_per_plotID.csv", row.names = FALSE)
 
+# 3. format for ordination data frame
+# ---------------------------------------
 
-ord_df_clim <- merge(x = ord_df,
-                 all.x = TRUE,
-                 y = plot_means_,
-                 by = 'plotID')
+soil_mst <- read.csv("../../data_processed/mean_soil_moisture_per_plotID.csv")
+soil_t <- read.csv('../../data_processed/mean_soil_temp_per_plotID.csv')
+
+# read in plot scores from site-specific ordination
+mds_axes_wide <- read.csv("../../results/models/ordination/gnmds_axes_k2_sitespecific_wide.csv")
+
+# read in site-specific ordination data frames in list
+data_list <- list(
+  skj = read.csv("../../data_processed/ord_df_skj.csv"),
+  ulv = read.csv("../../data_processed/ord_df_ulv.csv"),
+  lav = read.csv("../../data_processed/ord_df_lav.csv"),
+  gud = read.csv("../../data_processed/ord_df_gud.csv")
+)
+
+# specify sites for looping
+sites = c("skj", "ulv", "lav", "gud")
+
+# add gnmds plot scores to site-specific data frames
+for (site in sites) {
+  print(site)
+  data_list[[site]]$mds1 <- na.omit(mds_axes_wide[[paste0(site, "_1")]])
+  data_list[[site]]$mds2 <- na.omit(mds_axes_wide[[paste0(site, "_2")]])
+}
+
+# add soil moisture and temperature as new columns per site,
+# by merging (joining) data by plotID
+for (site in sites) {
+  print(paste("adding soil temperature for: ", site))
+  data_list[[site]] <- merge(
+    x = data_list[[site]],
+    all.x = TRUE,
+    y = soil_t,
+    by.x = 'plotID',
+    by.y = 'plotID'
+  )
+  print(paste("adding soil moisture for: ", site))
+  data_list[[site]] <- merge(
+    x = data_list[[site]],
+    all.x = TRUE,
+    y = soil_mst,
+    by.x = 'plotID',
+    by.y = 'plotID'
+  )
+}
 
 # reorder columns
-ord_df_clim <- ord_df_clim %>% 
-  select(Site,prec,blockID,plotID,subPlotID:mds3,
-         soil_mst_mean, everything())
+data_list[["skj"]][1:5,1:10]
+for (site in sites) {
+  data_list[[site]] <- data_list[[site]] %>%
+    select(Site, blockID, plotID, subPlotID,
+           prec,mds1, mds2, soil_tmp_mean, soil_mst_mean,
+           everything())
+}
 
-saveRDS(ord_df_clim,'../../data_processed/ord_df_clim.Rds')
+saveRDS(data_list,
+        '../../data_processed/subplot_data_sitespecific_list.Rds')
 
 
