@@ -6,11 +6,13 @@
 
 # Need to provide an SXY file: study design (S) and/or covariates (X) and species data (Y) 
 # The files TP and P are optional, so indicate with TRUE/FALSE if they are included or not
-is.TP = FALSE # is there trait data? TO BE ADDED
-is.P = FALSE # is there phylogeny data? TO BE ADDED
+is.TP = FALSE # is there trait data? 
+is.P = FALSE # is there phylogeny data? 
+
+setwd('C:/Users/evaler/OneDrive - Universitetet i Oslo/Eva/PHD/hmsc_incline/src/analysis/')
 
 # READING IN SXY: 
-SXY = read.csv("Data/SXY.csv", stringsAsFactors=TRUE)
+SXY = read.csv("../../data/SXY.csv", stringsAsFactors=TRUE)
 SXY[1:5,1:10]
 #split the SXY file into components
 S=SXY[,1:4] # study design; Columns Site, Block, plot, subPlot

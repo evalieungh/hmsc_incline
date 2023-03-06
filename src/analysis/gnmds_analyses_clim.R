@@ -20,23 +20,23 @@ library(plotly)} # for 3D plotting
 setwd('C:/Users/evaler/OneDrive - Universitetet i Oslo/Eva/PHD/hmsc_incline/src/analysis/')
   # global ordination with k = 3 (three-dimensional solution)
 mds <- readRDS('../../results/models/mds_k3.Rds') 
-gnmds3_1 <- readRDS('../../results/models/gnmds3_1.Rds') # axis 1
-gnmds3_2 <- readRDS('../../results/models/gnmds3_2.Rds')
-gnmds3_3 <- readRDS('../../results/models/gnmds3_3.Rds')
-mds1var <- readRDS('../../results/models/k3_mds1var.Rds') # species scores for axis 1
-mds2var <- readRDS('../../results/models/k3_mds2var.Rds')
-mds3var <- readRDS('../../results/models/k3_mds3var.Rds')
+gnmds3_1 <- readRDS('../../results/models/ordination/gnmds3_1.Rds') # axis 1
+gnmds3_2 <- readRDS('../../results/models/ordination/gnmds3_2.Rds')
+gnmds3_3 <- readRDS('../../results/models/ordination/gnmds3_3.Rds')
+mds1var <- readRDS('../../results/models/ordination/k3_mds1var.Rds') # species scores for axis 1
+mds2var <- readRDS('../../results/models/ordination/k3_mds2var.Rds')
+mds3var <- readRDS('../../results/models/ordination/k3_mds3var.Rds')
 ord_df <- readRDS('../../data_processed/ord_df.Rds') # data frame with ordination axes and species occurrences; to be modified further down
 
   # site-specific
-mds_axes_long <- read.csv("../../results/models/gnmds_axes_k2_sitespecific.csv")
-mds_axes_wide <- read.csv("../../results/models/gnmds_axes_k2_sitespecific_wide.csv")
+mds_axes_long <- read.csv("../../results/models/ordination/gnmds_axes_k2_sitespecific.csv")
+mds_axes_wide <- read.csv("../../results/models/ordination/gnmds_axes_k2_sitespecific_wide.csv")
 ord_df_skj <- read.csv("../../data_processed/ord_df_skj.csv")
 ord_df_ulv <- read.csv("../../data_processed/ord_df_ulv.csv")
 ord_df_lav <- read.csv("../../data_processed/ord_df_lav.csv")
 ord_df_gud <- read.csv("../../data_processed/ord_df_gud.csv")
 
-# 1. PLOT SCORES
+# 1. PLOT ord_df_gudSCORES
 # -----------------------------------
 
 

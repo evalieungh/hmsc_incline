@@ -772,11 +772,11 @@ mds_axes <-
   )
 
 # save axes
-saveRDS(gnmds3_1, "../../results/models/gnmds3_1.Rds")
-saveRDS(gnmds3_2, "../../results/models/gnmds3_2.Rds")
-saveRDS(gnmds3_3, "../../results/models/gnmds3_3.Rds")
+saveRDS(gnmds3_1, "../../results/models/ordination/gnmds3_1.Rds")
+saveRDS(gnmds3_2, "../../results/models/ordination/gnmds3_2.Rds")
+saveRDS(gnmds3_3, "../../results/models/ordination/gnmds3_3.Rds")
 write.csv(mds_axes,
-          "../../results/models/gnmds_axes_k2_sitespecific.csv")
+          "../../results/models/ordination/gnmds_axes_k2_sitespecific.csv")
 
 # alternative wide format
 mds_obj_list <- mds_axes %>%
@@ -785,7 +785,7 @@ mds_obj_list <- mds_axes %>%
               values_from = axis_pts)
 write.csv(
   mds_obj_list,
-  "../../results/models/gnmds_axes_k2_sitespecific_wide.csv",
+  "../../results/models/ordination/gnmds_axes_k2_sitespecific_wide.csv",
   row.names = FALSE
 )
 

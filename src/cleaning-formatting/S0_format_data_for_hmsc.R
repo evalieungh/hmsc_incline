@@ -59,8 +59,10 @@ SXY <- data.frame(SXY[,1:5],Y)
 
 # Microclimatic covariates (x)
 #------------------------------------------
-# to be added!
-
+# soil moisture and temperature.
+microclimate_data_list <- 
+  readRDS('../../data_processed/subplot_data_sitespecific_list.Rds')
+microclimate_data_list[["skj"]][1:5,1:8]
 
 
 # export SXY file
