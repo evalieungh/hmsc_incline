@@ -8,6 +8,7 @@ resources/
 results/
 writing/
 src/archive/
+src/allData.R
 src/.Rdata
 src/.Rhistory
 src/.RDataTmp
@@ -17,3 +18,4 @@ src/.RData
 src/.Ruserdata
 src/.Rproj.user
 src/III_incline_hmsc.Rproj
+src/gramforb.R

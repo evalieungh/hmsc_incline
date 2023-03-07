@@ -97,6 +97,31 @@ ord_df_ulv <- read.csv("../../data_processed/ord_df_ulv.csv")
 ord_df_lav <- read.csv("../../data_processed/ord_df_lav.csv")
 ord_df_gud <- read.csv("../../data_processed/ord_df_gud.csv")
 
+# separate on site
+ord_df_skj <- ord_df[ord_df$Site == "Skjellingahaugen", ]
+ord_df_ulv <- ord_df[ord_df$Site == "Ulvehaugen", ]
+ord_df_lav <- ord_df[ord_df$Site == "Lavisdalen", ]
+ord_df_gud <- ord_df[ord_df$Site == "Gudmedalen", ]
+
+# save dfs for later
+write.csv(ord_df_skj,
+          "../../data_processed/ord_df_skj.csv",
+          row.names = FALSE)
+write.csv(ord_df_ulv,
+          "../../data_processed/ord_df_ulv.csv",
+          row.names = FALSE)
+write.csv(ord_df_lav,
+          "../../data_processed/ord_df_lav.csv",
+          row.names = FALSE)
+write.csv(ord_df_gud,
+          "../../data_processed/ord_df_gud.csv",
+          row.names = FALSE)
+# loading same objects
+ord_df_skj <- read.csv("../../data_processed/ord_df_skj.csv")
+ord_df_ulv <- read.csv("../../data_processed/ord_df_ulv.csv")
+ord_df_lav <- read.csv("../../data_processed/ord_df_lav.csv")
+ord_df_gud <- read.csv("../../data_processed/ord_df_gud.csv")
+
 # 2. DCA
 # ------------------------------
 # use decorana (de-trended cor-respondence ana-lysis) from J. Oksanen"s vegan package
@@ -403,6 +428,28 @@ plot(grl_sites$prec, grl_sites$length) # looks like the gradient lenght (indicat
   dca3var_gud <- scores(dca_gud, display = "species", origin = FALSE)[, 3]
   dca4var_gud <- scores(dca_gud, display = "species", origin = FALSE)[, 4]
 }
+{
+  # site-specific
+  dca1var_skj <- scores(dca_skj, display = "species", origin = FALSE)[, 1]
+  dca2var_skj <- scores(dca_skj, display = "species", origin = FALSE)[, 2]
+  dca3var_skj <- scores(dca_skj, display = "species", origin = FALSE)[, 3]
+  dca4var_skj <- scores(dca_skj, display = "species", origin = FALSE)[, 4]
+  
+  dca1var_ulv <- scores(dca_ulv, display = "species", origin = FALSE)[, 1]
+  dca2var_ulv <- scores(dca_ulv, display = "species", origin = FALSE)[, 2]
+  dca3var_ulv <- scores(dca_ulv, display = "species", origin = FALSE)[, 3]
+  dca4var_ulv <- scores(dca_ulv, display = "species", origin = FALSE)[, 4]
+  
+  dca1var_lav <- scores(dca_lav, display = "species", origin = FALSE)[, 1]
+  dca2var_lav <- scores(dca_lav, display = "species", origin = FALSE)[, 2]
+  dca3var_lav <- scores(dca_lav, display = "species", origin = FALSE)[, 3]
+  dca4var_lav <- scores(dca_lav, display = "species", origin = FALSE)[, 4]
+  
+  dca1var_gud <- scores(dca_gud, display = "species", origin = FALSE)[, 1]
+  dca2var_gud <- scores(dca_gud, display = "species", origin = FALSE)[, 2]
+  dca3var_gud <- scores(dca_gud, display = "species", origin = FALSE)[, 3]
+  dca4var_gud <- scores(dca_gud, display = "species", origin = FALSE)[, 4]
+}
 
 # 3. GNMDS
 # ------------------------------
@@ -584,6 +631,11 @@ mds.stress <- unlist(lapply(mds, function(v) {
     v[[22]]
   }))
 }
+
+mds.stress.skj <- unlist(lapply(mds_skj,function(v){v[[22]]}))
+mds.stress.ulv <- unlist(lapply(mds_ulv,function(v){v[[22]]}))
+mds.stress.lav <- unlist(lapply(mds_lav,function(v){v[[22]]}))
+mds.stress.gud <- unlist(lapply(mds_gud,function(v){v[[22]]}))
 
 # view and order the stress values for the 100 MDSs:
 mds.stress

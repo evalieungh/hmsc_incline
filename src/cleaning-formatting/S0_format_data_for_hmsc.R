@@ -25,12 +25,8 @@ setwd("C:/Users/evaler/OneDrive - Universitetet i Oslo/Eva/PHD/hmsc_incline/src/
 SY <- read.csv("../../data/VCG/INCLINE_community/INCLINE_community_2018_clean.csv")
 SY[1:3,1:10]
 
-# extract only Study design columns (S) 
-S = SY %>%
-  select(site, blockID, plotID, subPlotID)
-
-# remove too rare or common species 
-Y = SY[,which(names(SY) =="Ant_odo"):ncol(SY)] # extract species data
+# remove too rare or common species
+Y = SY[,6:ncol(SY)] # extract species data
 ubiquitous = round(nrow(Y) * 0.9) # define threshold for being too common
 rare = round(nrow(Y) * 0.01) # define threshold for being too rare
 print(paste("too rare if <", rare, "& too common if >", ubiquitous))
@@ -43,38 +39,36 @@ colnames(Y)[grepl('_sp',colnames(Y))] # check for genus-level records. Include f
 
 # final list of species to include
 species <- c(names(Y))
-print(paste(length(names(Y)),"species included in analyses"))
-write.csv(species,"../../data/specieslist.csv",row.names = FALSE)
+write.csv(species,'Data/specieslist.csv',row.names = FALSE)
 
 # save SY with the correct species
-SY <- data.frame(S,Y) 
+SY <- data.frame(SY[,1:5],Y) 
 
 # Covariates (x)
 #------------------------------------------
 # make precipitation covariate, annual means (Gya et al. 2022)
 SXY <- SY %>%
   mutate(prec = as.integer(ifelse(
-    site == 'Skjellingahaugen', 3402,
+    Site == 'Skjellingahaugen', 3402,
     ifelse(
-      site == 'Gudmedalen', 2130,
+      Site == 'Gudmedalen', 2130,
       ifelse(
-        site == 'Lavisdalen', 1561,
+        Site == 'Lavisdalen', 1561,
         ifelse(
-          site == 'Ulvehaugen', 1226, (.)))
+          Site == 'Ulvehaugen', 1226, (.)))
     )
   )))
 
 # soil moisture and temperature
 microclimate_data_list <- 
   readRDS('../../data_processed/subplot_data_sitespecific_list.Rds')
-microclimate_data_list[["skj"]][1:5,1:10] # NB site name has capital S
+microclimate_data_list[["skj"]][1:5,1:10]
 
-# fill in NAs with site mean for soil moisture and temperature. 
-# Covariates cannot have NAs.
+# fill in NAs with site mean for soil moisture and temperature. Covariates cannot have NAs.
 # NB! this will pull analyses in the direction of no response. 
 # i.e. it might obscure signals from the data. 
 # Any significant results/trends will likely be reliable, but harder to detect 
-# (lower analytical power of the method)
+# (lower the analytical power of the method)
 sites = c("skj", "ulv", "lav", "gud")
 
 for (site in sites) {
@@ -118,8 +112,7 @@ SXY <- merge(
   by.y = "subPlotID"
 )
 
-# PROBLEM - need to fix before re-running models
-SXY[86:120,c(1:5,54:62)] # microclimate missing for Gud_1_4 !
+SXY[86:120,c(1:5,64:68)] # missing for Gud_1_4 !
 microclimate_data_list[["gud"]][microclimate_data_list[["gud"]]$plotID == "Gud_1_4",1:5]
 # Missing already in ordination_dataframe_global.csv made in community_gradientanalysis.R
 
