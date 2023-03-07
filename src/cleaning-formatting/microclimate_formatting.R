@@ -5,7 +5,8 @@
 # Script by Eva L
 # started 2023-01-16
 
-# data downloaded from https://osf.io/hrygk, INCLINE_microclimate.zip
+# data downloaded from INCLINE OSF
+# https://osf.io/hrygk, INCLINE_microclimate.zip
 # download date: 2023-01-16
 
 # 1. inspect and clean data
@@ -30,8 +31,7 @@ library(data.table) # to subset multiple date ranges effectively
 setwd('C:/Users/evaler/OneDrive - Universitetet i Oslo/Eva/PHD/hmsc_incline/src/analysis/')
 
 soil_mst <- read.csv(
-  '../../data/VCG/INCLINE_microclimate/data_cleaned
-  /INCLINE_microclimate_soil_moisture.csv')
+  '../../data/VCG/INCLINE_microclimate/data_cleaned/INCLINE_microclimate_soil_moisture.csv')
 air_tmp <- read.csv(
   '../../data/VCG/INCLINE_microclimate/data_cleaned/INCLINE_microclimate_air_temperature.csv')
 grnd_tmp <- read.csv(
@@ -289,7 +289,7 @@ data_list <- list(
   skj = read.csv("../../data_processed/ord_df_skj.csv"),
   ulv = read.csv("../../data_processed/ord_df_ulv.csv"),
   lav = read.csv("../../data_processed/ord_df_lav.csv"),
-  gud = read.csv("../../data_processed/ord_df_gud.csv")
+  gud = read.csv("../../data_processed/ord_df_gud.csv") # NB! Gud_1_4 missing
 )
 
 # specify sites for looping
@@ -334,6 +334,3 @@ for (site in sites) {
 
 saveRDS(data_list,
         '../../data_processed/subplot_data_sitespecific_list.Rds')
-
-
-
