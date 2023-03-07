@@ -5,7 +5,7 @@
 # script by Eva Lieungh, Rune Halvorsen
 
 # data downloaded from INCLINE OSF repository
-# <link>
+# https://osf.io/zhk3m/
 # prerequisite: community_cleaning script to get
 # subplot presences as rows, species as columns
 
@@ -17,7 +17,7 @@
 
 # five ordinations with parallel methods:
 # first all data ("global" analysis),
-# then per individual site.
+# then for each of 4 sites.
 # DCA and GNMDS. If the same axes appear in both methods,
 # they are more likely to represent real gradients in species composition.
 
@@ -70,7 +70,7 @@ rm(row0, col0) # clean up environment
 write.csv(ord_df,
           "../../data_processed/ordination_dataframe_global.csv",
           row.names = FALSE)
-ord_df <- read.csv("../../data_processed/ordination_dataframe_global.csv")
+ord_df <- read.csv("../../data_processed/ordination_dataframe_global.csv") # "Gud_1_4" missing
 
 # separate on site
 ord_df_skj <- ord_df[ord_df$Site == "Skjellingahaugen", ]
