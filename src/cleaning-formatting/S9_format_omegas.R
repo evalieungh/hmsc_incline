@@ -12,10 +12,10 @@ library(tidyverse)
 
 # read data matrix (a=association=omega estimate)
 #-------------------------------------
-a_skj <- read.csv('../../data_processed/model_output/Omega_Skjellingahaugen_subplot.csv', row.names = 1)
-a_gud <- read.csv('../../data_processed/model_output/Omega_Gudmedalen_subplot.csv',row.names = 1) # estimated associations
-a_lav <- read.csv('../../data_processed/model_output/Omega_Lavisdalen_subplot.csv',row.names = 1)
-a_ulv <- read.csv('../../data_processed/model_output/Omega_Ulvehaugen_subplot.csv',row.names = 1)
+a_skj <- read.csv('../../results/models/model_output/Omega_Skjellingahaugen_subplot.csv', row.names = 1)
+a_gud <- read.csv('../../results/models/model_output/Omega_Gudmedalen_subplot.csv',row.names = 1) # estimated associations
+a_lav <- read.csv('../../results/models/model_output/Omega_Lavisdalen_subplot.csv',row.names = 1)
+a_ulv <- read.csv('../../results/models/model_output/Omega_Ulvehaugen_subplot.csv',row.names = 1)
 
 # collect all data as list of association objects
 a_obj = list('a_skj'=a_skj,
@@ -38,7 +38,7 @@ saveRDS(a_obj,file = '../../data_processed/a_obj_lower.Rds')
 # pivot longer 
 # --------------------------------------
 # ...to get species pairs as columns and their co-occurrence as third axis
-a_obj <- readRDS('../../data_processed/a_obj_lower.Rds')
+a_obj <- readRDS('../../data_processed/a_obj_full.Rds')
 
 # collect all omega matrices for all 4 sites
 omegas <- data.frame(siteID = c(rep('Gudmedalen',58),rep('Lavisdalen',58),
@@ -48,12 +48,12 @@ omegas <- data.frame(siteID = c(rep('Gudmedalen',58),rep('Lavisdalen',58),
 
 # pivot longer to get sites, species pairs (A and B), and omega value
 omegas_l <- omegas %>%
-  pivot_longer(Ach_mil:Vio_pal, # all species, but not site or species name columns
+  pivot_longer(Ach_mil:Vio_pal, # pivot all species, but not site or species name columns
                names_to = 'speciesB',
                values_to = 'omega')
 
-# remove rows where omega is NA
-omegas_l <- na.omit(omegas_l)
+# remove same species rows
+omegas_l <- omegas_l[omegas_l$speciesA != omegas_l$speciesB,]
 
 # save object
 saveRDS(omegas_l,'../../data_processed/omegas_long.Rds')
