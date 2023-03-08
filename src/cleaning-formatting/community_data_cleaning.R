@@ -36,7 +36,7 @@ community <- unique(community)
 # select only relevant columns, and 
 # pivot wider to get subplots as rows, species as columns
 community <- community %>%
-  select(site, blockID, plotID, subPlotID, year, 
+  select(site, blockID, plotID, subPlotID,  
          logger, vegetation_height_mm, moss_depth_mm,
          species, presence) %>%
   pivot_wider(names_from = species, 
@@ -46,5 +46,14 @@ community <- community %>%
 
 community[1:5,1:10]
 
+# Check if any species should be left out
+names(community)
+remove_these_species = c("Nid_seedling", "Unknown", "Fern")
+
+# remove uninformative taxa
+community <- community[, -which(names(community) %in% remove_these_species)]
+
 # save clean data
-write.csv(community,"../../data/VCG/INCLINE_community/INCLINE_community_2018_clean.csv")
+write.csv(community,
+          "../../data/VCG/INCLINE_community/INCLINE_community_2018_clean.csv",
+          row.names = FALSE)
