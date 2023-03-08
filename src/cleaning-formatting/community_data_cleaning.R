@@ -1,46 +1,50 @@
-#######################################
+#####################################
 #  Download and clean INCLINE data  #
-#######################################
+#####################################
 
 # Script by Eva Lieungh
 # started 2023-03-06
 
 # Clean INCLINE community data from OSF,
-# 
-# 
+# https://osf.io/mn3t9
+# INCLINE_community_subplot.csv
+# downloaded 2023-03-08
 
 library(tidyverse)
 
 setwd("C:/Users/evaler/OneDrive - Universitetet i Oslo/Eva/PHD/hmsc_incline/src/cleaning-formatting/")
 
 community <- 
-  read.csv("../../data/VCG/INCLINE_community/community_clean_med_NA_2023-03-06.csv", 
+  read.csv("../../data/VCG/INCLINE_community/INCLINE_community_subplot.csv", 
                       sep = ";")
-
-# inspect data 
 head(community)
-str(community)
-
-# pivot wider
-community <- community %>%
-  pivot_wider(names_from = species, 
-              values_from = presence)
-
-# add new unique subplot ID
-community$subPlotID = paste(substr(community$site,1,3),
-                            community$block,
-                            community$plot,
-                            community$subPlot,
-                            sep = '_')
 
 # subset only 2018 data
 community <- subset(community,year==2018)
 
-# and columns with study design and species
-community <- community %>%
-  select(site, block, plot, subPlotID,
-         everything())
+# add unique block ID and subplot ID
+community$blockID <- substr(community$plotID,
+                            start = 1,
+                            stop = 5)
+community$subPlotID <- paste(community$plotID, 
+                             community$subPlot,
+                             sep = "_")
 
+# remove duplicates
+community <- unique(community)
+
+# select only relevant columns, and 
+# pivot wider to get subplots as rows, species as columns
+community <- community %>%
+  select(site, blockID, plotID, subPlotID, year, 
+         logger, vegetation_height_mm, moss_depth_mm,
+         species, presence) %>%
+  pivot_wider(names_from = species, 
+              values_from = presence, 
+              values_fn = function(x) max(x),
+              values_fill = 0)
+
+community[1:5,1:10]
 
 # save clean data
 write.csv(community,"../../data/VCG/INCLINE_community/INCLINE_community_2018_clean.csv")
