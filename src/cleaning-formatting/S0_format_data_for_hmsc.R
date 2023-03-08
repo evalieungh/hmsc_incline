@@ -29,10 +29,9 @@ SY[1:3,1:10]
 S = SY %>%
   select(site, blockID, plotID, subPlotID)
 
-# extract species columns (Y)
-Y = SY[,which(names(SY) =="Ant_odo"):ncol(SY)] 
-
 # remove too rare or common species 
+Y = SY[,which(names(SY) =="Ant_odo"):ncol(SY)] # extract species data
+
 ubiquitous = round(nrow(Y) * 0.9) # define threshold for being too common
 rare = round(nrow(Y) * 0.01) # define threshold for being too rare
 print(paste("too rare if <", rare, "& too common if >", ubiquitous))
@@ -45,40 +44,41 @@ colnames(Y)[grepl('_sp',colnames(Y))] # check for genus-level records. Include f
 
 # final list of species to include
 species <- c(names(Y))
-write.csv(species,'Data/specieslist.csv',row.names = FALSE)
+print(paste(length(names(Y)),"species included in analyses"))
+write.csv(species,"../../data/specieslist.csv",row.names = FALSE)
 
 # order species columns alphabetically
 Y <- Y[,order(colnames(Y))]
 
 # save SY with the correct species
-SY <- data.frame(SY[,1:5],Y) 
+SY <- data.frame(S,Y) 
 
 # Covariates (x)
 #------------------------------------------
 # make precipitation covariate, annual means (Gya et al. 2022)
 SXY <- SY %>%
   mutate(prec = as.integer(ifelse(
-    Site == 'Skjellingahaugen', 3402,
+    site == 'Skjellingahaugen', 3402,
     ifelse(
-      Site == 'Gudmedalen', 2130,
+      site == 'Gudmedalen', 2130,
       ifelse(
-        Site == 'Lavisdalen', 1561,
+        site == 'Lavisdalen', 1561,
         ifelse(
-          Site == 'Ulvehaugen', 1226, (.)))
+          site == 'Ulvehaugen', 1226, (.)))
     )
   )))
 
 # soil moisture and temperature
 microclimate_data_list <- 
   readRDS('../../data_processed/subplot_data_sitespecific_list.Rds')
-microclimate_data_list[["skj"]][1:5,1:10] 
+microclimate_data_list[["skj"]][1:5,1:10] # NB site name has capital S
 
-# fill in NAs with site mean for soil moisture and temperature. Covariates cannot have NAs.
+# fill in NAs with site mean for soil moisture and temperature. 
+# Covariates cannot have NAs.
 # NB! this will pull analyses in the direction of no response. 
 # i.e. it might obscure signals from the data. 
 # Any significant results/trends will likely be reliable, but harder to detect 
 # (lower analytical power of the method)
-
 sites = c("skj", "ulv", "lav", "gud")
 
 # fill in NAs with site mean
@@ -117,8 +117,25 @@ X <- do.call(rbind, lapply(microclimate_data_list, function(x)
 SXY <- left_join(
   x = SXY,
   y = X,
-  by = "subPlotID",
-  )
+  by.x = "subPlotID",
+  by.y = "subPlotID"
+)
+
+# PROBLEM - need to fix before re-running models
+SXY[86:120,c(1:5,54:62)] # microclimate missing for Gud_1_4 !
+microclimate_data_list[["gud"]][microclimate_data_list[["gud"]]$plotID == "Gud_1_4",1:5]
+# Missing already in ordination_dataframe_global.csv made in community_gradientanalysis.R
+
+# other affected scripts:
+# /hmsc_incline/src$ grep -rl "ord_df_gud.csv"
+# analysis/community_gradientanalysis.R
+# analysis/gnmds_analyses_clim.R
+# analysis/gnmds_calculate_species_scores.R
+# analysis/microclimate_tempersture_analysis.R
+# cleaning-formatting/microclimate_formatting.R
+  
+# reorder columns
+SXY[1:5, c(1:10,c(ncol(SXY)-5):ncol(SXY))]
 
 # reorder columns
 SXY[1:5, c(1:10,c(ncol(SXY)-5):ncol(SXY))] # show first&last cols
