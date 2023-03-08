@@ -57,3 +57,4 @@ community <- community[, -which(names(community) %in% remove_these_species)]
 write.csv(community,
           "../../data/VCG/INCLINE_community/INCLINE_community_2018_clean.csv",
           row.names = FALSE)
+

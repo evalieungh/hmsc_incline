@@ -31,6 +31,7 @@ S = SY %>%
 
 # remove too rare or common species 
 Y = SY[,which(names(SY) =="Ant_odo"):ncol(SY)] # extract species data
+
 ubiquitous = round(nrow(Y) * 0.9) # define threshold for being too common
 rare = round(nrow(Y) * 0.01) # define threshold for being too rare
 print(paste("too rare if <", rare, "& too common if >", ubiquitous))
