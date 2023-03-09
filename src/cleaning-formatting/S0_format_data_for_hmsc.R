@@ -47,6 +47,9 @@ species <- c(names(Y))
 print(paste(length(names(Y)),"species included in analyses"))
 write.csv(species,"../../data/specieslist.csv",row.names = FALSE)
 
+# order species columns alphabetcally
+Y <- Y[,order(colnames(Y))]
+
 # save SY with the correct species
 SY <- data.frame(S,Y) 
 
@@ -68,7 +71,7 @@ SXY <- SY %>%
 # soil moisture and temperature
 microclimate_data_list <- 
   readRDS('../../data_processed/subplot_data_sitespecific_list.Rds')
-microclimate_data_list[["skj"]][1:5,1:10] # NB site name has capital S
+microclimate_data_list[["skj"]][1:5,1:10] 
 
 # fill in NAs with site mean for soil moisture and temperature. 
 # Covariates cannot have NAs.
@@ -76,8 +79,10 @@ microclimate_data_list[["skj"]][1:5,1:10] # NB site name has capital S
 # i.e. it might obscure signals from the data. 
 # Any significant results/trends will likely be reliable, but harder to detect 
 # (lower analytical power of the method)
+
 sites = c("skj", "ulv", "lav", "gud")
 
+# fill in NAs with site mean
 for (site in sites) {
   mean_soil_temp = mean(na.omit(microclimate_data_list[[site]]$soil_tmp_mean))
   NA_rows_temp = which(is.na(microclimate_data_list[[site]]$soil_tmp_mean))
@@ -93,18 +98,18 @@ for (site in sites) {
   print(paste("number of NAs replaced:", length(NA_rows_mst)))
 }
 
-# mean soil temperature at skj  is:  10.4243350258643
-# mean soil moisture at skj  is:  0.353139166009143
-# number of NAs replaced: 812
-# mean soil temperature at ulv  is:  9.0764489007919
-# mean soil moisture at ulv  is:  0.263136979609348
-# number of NAs replaced: 667
-# mean soil temperature at lav  is:  8.15262006794624
-# mean soil moisture at lav  is:  0.159625469438193
-# number of NAs replaced: 725
-# mean soil temperature at gud  is:  10.918808042157
-# mean soil moisture at gud  is:  0.25086364215791
-# number of NAs replaced: 841
+# "mean soil temperature at skj  is:  10.4243350258643"
+# "mean soil moisture at skj  is:  0.353139166009143"
+# "number of NAs replaced: 812"
+# "mean soil temperature at ulv  is:  9.0627981896047"
+# "mean soil moisture at ulv  is:  0.264391688358114"
+# "number of NAs replaced: 812"
+# "mean soil temperature at lav  is:  8.19444095824834"
+# "mean soil moisture at lav  is:  0.16088567508394"
+# "number of NAs replaced: 812"
+# "mean soil temperature at gud  is:  11.0197369146538"
+# "mean soil moisture at gud  is:  0.247336310399004"
+# "number of NAs replaced: 870"
 
 # combine the relevant covariates for all sites
 X <- do.call(rbind, lapply(microclimate_data_list, function(x)
@@ -119,29 +124,17 @@ SXY <- merge(
   by.y = "subPlotID"
 )
 
-# PROBLEM - need to fix before re-running models
-SXY[86:120,c(1:5,54:62)] # microclimate missing for Gud_1_4 !
-microclimate_data_list[["gud"]][microclimate_data_list[["gud"]]$plotID == "Gud_1_4",1:5]
-# Missing already in ordination_dataframe_global.csv made in community_gradientanalysis.R
-
-# other affected scripts:
-# /hmsc_incline/src$ grep -rl "ord_df_gud.csv"
-# analysis/community_gradientanalysis.R
-# analysis/gnmds_analyses_clim.R
-# analysis/gnmds_calculate_species_scores.R
-# analysis/microclimate_tempersture_analysis.R
-# cleaning-formatting/microclimate_formatting.R
-  
 # reorder columns
-SXY[1:5, c(1:10,c(ncol(SXY)-5):ncol(SXY))]
+SXY[1:5, c(1:10,c(ncol(SXY)-5):ncol(SXY))] # show first&last cols
 
 SXY <- SXY %>%
-select(Site:subPlotID,prec,Ach_mil:Vio_sp)
-SXY[1:5,1:10]
+  select(site, blockID, plotID, subPlotID,
+       prec, soil_mst_mean, soil_tmp_mean, 
+       everything())
+SXY[1:5,1:20]
 
 # export SXY file
 write.csv(SXY,"../../data/SXY.csv", row.names = FALSE)
-
 
 # Reference
 # Gya, R., Töpper, J.P., Olsen, S.L., Lieungh, E., Gaudard, J., Egelkraut, D.,
