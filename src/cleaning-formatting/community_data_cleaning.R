@@ -33,6 +33,24 @@ community$subPlotID <- paste(community$plotID,
                              community$subPlot,
                              sep = "_")
 
+# found out subPlotID Skj_7_1_23 is there, but should not be.
+row_to_delete = which(community$subPlotID == "Skj_7_1_23")
+community <- community[-row_to_delete,]
+
+# Check for duplicated rows
+duplicated_rows <- duplicated(community)
+
+# Identify which rows are duplicated
+duplicated_indices <- which(duplicated_rows)
+
+# Print the duplicated rows
+if (length(duplicated_indices) > 0) {
+  cat("The following rows are duplicated:\n")
+  print(community[duplicated_indices, ])
+} else {
+  cat("No duplicated rows found.\n")
+}
+
 # remove duplicates
 community <- unique(community)
 
