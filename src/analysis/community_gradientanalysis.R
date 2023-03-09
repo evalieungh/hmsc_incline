@@ -80,11 +80,11 @@ ord_df_ulv <- read.csv("../../data_processed/ord_df_ulv.csv")
 ord_df_lav <- read.csv("../../data_processed/ord_df_lav.csv")
 ord_df_gud <- read.csv("../../data_processed/ord_df_gud.csv")
 
-
 # 2. DCA
 # ------------------------------
 # use decorana (de-trended cor-respondence ana-lysis) from J. Oksanen"s vegan package
-dca <- decorana(ord_df[, 6:ncol(ord_df)]) # global analysis
+first_sp_col = which(colnames(ord_df) == "Ant_odo")
+dca <- decorana(ord_df[, first_sp_col:ncol(ord_df)]) # global analysis
 dca_skj <- decorana(ord_df_skj[, 6:ncol(ord_df_skj)]) # per site
 dca_ulv <- decorana(ord_df_ulv[, 6:ncol(ord_df_ulv)])
 dca_lav <- decorana(ord_df_lav[, 6:ncol(ord_df_lav)])

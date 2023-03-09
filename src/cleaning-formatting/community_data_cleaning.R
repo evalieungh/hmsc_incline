@@ -19,6 +19,9 @@ community <-
                       sep = ";")
 head(community)
 
+# one row has NA instead of 0/1. Change to 0
+community[community$plotID== "Gud_7_4" & community$subPlot == "2" & community$species == "Ran_acr","presence"] <- 0
+
 # subset only 2018 data
 community <- subset(community,year==2018)
 
