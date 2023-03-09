@@ -5,15 +5,8 @@
 # script by Eva Lieungh, Rune Halvorsen
 
 # data downloaded from INCLINE OSF repository
-# https://osf.io/zhk3m/
 # prerequisite: community_cleaning script to get
 # subplot presences as rows, species as columns
-
-# files needed to reproduce results:
-# INCLINE_community_2018_clean.csv
-# dist_y.Rds
-# geodist_y.Rds
-# mds_k3.Rds
 
 # five ordinations with parallel methods:
 # first all data ("global" analysis),

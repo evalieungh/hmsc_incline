@@ -2,7 +2,7 @@
 #  Define models  #
 ###################
 
-# script by Otso Ovaskainen, Hmsc developers, Eva Lieungh
+# script by Otso Ovaskainen, Eva Lieungh
 # started 2022-04-26
 
 setwd("U:/all stuff/manuscripts/InPreparation/Eva Lieungh alpine plants")
@@ -20,6 +20,12 @@ for(i in 1:n){
 }
 loc.x = rep(c(1,2,3,4,5,6,7),5)[sub.plot.number]
 loc.y = c(rep(5,7),rep(4,7),rep(3,7),rep(2,7),rep(1,7))[sub.plot.number]
+
+# NB: the units of spatial coordinates are subplots, 
+# i.e. subplot 24 has coords x=3, y=2. To get actual distances, 
+# multiply with 5 cm. Model is set up to consider neighbours 
+# up to distances=6, so all subplots within same plot 
+# but not between plots.
 
 XData = data.frame(prec=as.numeric(da$prec))
 Y = as.matrix(da[,-(1:5)])
