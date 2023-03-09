@@ -3,8 +3,10 @@
 ##################################################
 
 # script by Eva Lieungh, Rune Halvorsen
+# started 2022-12 from Rune's script used in 
+# BIOS9210 – Methods of Gradient Analysis
 
-# data downloaded from INCLINE OSF repository
+# community data downloaded from INCLINE OSF repository
 # prerequisite: community_cleaning script to get
 # subplot presences as rows, species as columns
 
@@ -85,10 +87,10 @@ ord_df_gud <- read.csv("../../data_processed/ord_df_gud.csv")
 # use decorana (de-trended cor-respondence ana-lysis) from J. Oksanen"s vegan package
 first_sp_col = which(colnames(ord_df) == "Ant_odo")
 dca <- decorana(ord_df[, first_sp_col:ncol(ord_df)]) # global analysis
-dca_skj <- decorana(ord_df_skj[, 6:ncol(ord_df_skj)]) # per site
-dca_ulv <- decorana(ord_df_ulv[, 6:ncol(ord_df_ulv)])
-dca_lav <- decorana(ord_df_lav[, 6:ncol(ord_df_lav)])
-dca_gud <- decorana(ord_df_gud[, 6:ncol(ord_df_gud)])
+dca_skj <- decorana(ord_df_skj[, first_sp_col:ncol(ord_df_skj)]) # per site
+dca_ulv <- decorana(ord_df_ulv[, first_sp_col:ncol(ord_df_ulv)])
+dca_lav <- decorana(ord_df_lav[, first_sp_col:ncol(ord_df_lav)])
+dca_gud <- decorana(ord_df_gud[, first_sp_col:ncol(ord_df_gud)]) # Warning message: In decorana(ord_df_gud[, 6:ncol(ord_df_gud)]) :  some species were removed because they were missing in the data
 
 # save dca objects
 saveRDS(dca, "../../results/models/dca_global.Rds")
@@ -287,42 +289,42 @@ plot(dca1_gud, dca3_gud)
     xlab = "axis 1",
     ylab = "axis 3"
   )
-  points(dca1_skj$dca1_skj,
-         dca3_skj$dca3_skj,
+  points(dca1_skj,
+         dca3_skj,
          cex = 0.5,
          col = "black")
-  points(dca1_ulv$dca1_ulv,
-         dca3_ulv$dca3_ulv,
+  points(dca1_ulv,
+         dca3_ulv,
          cex = 0.5,
          col = "blue")
-  points(dca1_lav$dca1_lav,
-         dca3_lav$dca3_lav,
+  points(dca1_lav,
+         dca3_lav,
          cex = 0.5,
          col = "green")
-  points(dca1_gud$dca1_gud,
-         dca3_gud$dca3_gud,
+  points(dca1_gud,
+         dca3_gud,
          cex = 0.5,
          col = "red")
-  abline(lm(dca1_skj$dca1_skj ~ dca3_skj$dca3_skj),
+  abline(lm(dca1_skj ~ dca3_skj),
          lwd = 3,
          col = "black")
-  abline(lm(dca1_ulv$dca1_ulv ~ dca3_ulv$dca3_ulv),
+  abline(lm(dca1_ulv ~ dca3_ulv),
          lwd = 3,
          col = "blue")
-  abline(lm(dca1_lav$dca1_lav ~ dca3_lav$dca3_lav),
+  abline(lm(dca1_lav ~ dca3_lav),
          lwd = 3,
          col = "green")
-  abline(lm(dca1_gud$dca1_gud ~ dca3_gud$dca3_gud),
+  abline(lm(dca1_gud ~ dca3_gud),
          lwd = 3,
          col = "red")
 }
 
 # calculate gradient lenghts
 # global
-(grl1 <- max(dca1) - min(dca1)) # 5.3
-(grl2 <- max(dca2) - min(dca2)) # 3.7
-(grl3 <- max(dca3) - min(dca3)) # 3.6
-(grl4 <- max(dca4) - min(dca4)) # 3.1
+(grl1 <- max(dca1) - min(dca1)) # 5.1
+(grl2 <- max(dca2) - min(dca2)) # 3.8
+(grl3 <- max(dca3) - min(dca3)) # 3.9
+(grl4 <- max(dca4) - min(dca4)) # 2.1
 # site-specific
 grl_sites <-
   data.frame(
@@ -330,7 +332,7 @@ grl_sites <-
       c("Skjellingahaugen", "Ulvehaugen", "Lavisdalen", "Gudmedalen"),
       each = 4
     ),
-    prec = rep(c(2725, 593, 1321, 1925), each = 4),
+    prec = rep(c(3402, 1226, 1561, 2130), each = 4),
     axis = rep(1:4, 4),
     length = c(
       grl1_skj = max(dca1_skj) - min(dca1_skj),
@@ -355,7 +357,7 @@ grl_sites <-
     )
   )
 write.csv(grl_sites, "../../data_processed/gradient_lengths_dca.csv")
-plot(grl_sites$prec, grl_sites$length) # looks like the gradient lenght (indicating largest turnover in species composition) may have an optimum in medium-dry sites.
+plot(grl_sites$prec, grl_sites$length) # longer gradients in dryer sites?
 
 # extract DCA species scores
 {
@@ -387,28 +389,31 @@ plot(grl_sites$prec, grl_sites$length) # looks like the gradient lenght (indicat
   dca3var_gud <- scores(dca_gud, display = "species", origin = FALSE)[, 3]
   dca4var_gud <- scores(dca_gud, display = "species", origin = FALSE)[, 4]
 }
-{
-  # site-specific
-  dca1var_skj <- scores(dca_skj, display = "species", origin = FALSE)[, 1]
-  dca2var_skj <- scores(dca_skj, display = "species", origin = FALSE)[, 2]
-  dca3var_skj <- scores(dca_skj, display = "species", origin = FALSE)[, 3]
-  dca4var_skj <- scores(dca_skj, display = "species", origin = FALSE)[, 4]
-  
-  dca1var_ulv <- scores(dca_ulv, display = "species", origin = FALSE)[, 1]
-  dca2var_ulv <- scores(dca_ulv, display = "species", origin = FALSE)[, 2]
-  dca3var_ulv <- scores(dca_ulv, display = "species", origin = FALSE)[, 3]
-  dca4var_ulv <- scores(dca_ulv, display = "species", origin = FALSE)[, 4]
-  
-  dca1var_lav <- scores(dca_lav, display = "species", origin = FALSE)[, 1]
-  dca2var_lav <- scores(dca_lav, display = "species", origin = FALSE)[, 2]
-  dca3var_lav <- scores(dca_lav, display = "species", origin = FALSE)[, 3]
-  dca4var_lav <- scores(dca_lav, display = "species", origin = FALSE)[, 4]
-  
-  dca1var_gud <- scores(dca_gud, display = "species", origin = FALSE)[, 1]
-  dca2var_gud <- scores(dca_gud, display = "species", origin = FALSE)[, 2]
-  dca3var_gud <- scores(dca_gud, display = "species", origin = FALSE)[, 3]
-  dca4var_gud <- scores(dca_gud, display = "species", origin = FALSE)[, 4]
-}
+
+# save species scores
+dca_species_scores_sitespecific <-
+  data.frame(
+    dca1var_skj,
+    dca2var_skj,
+    dca3var_skj,
+    dca4var_skj,
+    dca1var_ulv,
+    dca2var_ulv,
+    dca3var_ulv,
+    dca4var_ulv,
+    dca1var_lav,
+    dca2var_lav,
+    dca3var_lav,
+    dca4var_lav,
+    dca1var_gud,
+    dca2var_gud,
+    dca3var_gud,
+    dca4var_gud
+  )
+
+write.csv(dca_species_scores_sitespecific,
+          "../../results/dca_species_scores_sitespecific.csv",
+          row.names = TRUE)
 
 # 3. GNMDS
 # ------------------------------

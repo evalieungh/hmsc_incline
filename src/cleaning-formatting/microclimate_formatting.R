@@ -289,7 +289,7 @@ data_list <- list(
   skj = read.csv("../../data_processed/ord_df_skj.csv"),
   ulv = read.csv("../../data_processed/ord_df_ulv.csv"),
   lav = read.csv("../../data_processed/ord_df_lav.csv"),
-  gud = read.csv("../../data_processed/ord_df_gud.csv") # NB! Gud_1_4 missing
+  gud = read.csv("../../data_processed/ord_df_gud.csv") 
 )
 
 # specify sites for looping
@@ -327,8 +327,9 @@ for (site in sites) {
 data_list[["skj"]][1:5,1:10]
 for (site in sites) {
   data_list[[site]] <- data_list[[site]] %>%
-    select(Site, blockID, plotID, subPlotID,
-           prec,mds1, mds2, soil_tmp_mean, soil_mst_mean,
+    select(site, blockID, plotID, subPlotID,
+           prec,#mds1, mds2, 
+           soil_tmp_mean, soil_mst_mean,
            everything())
 }
 
