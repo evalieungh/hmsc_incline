@@ -32,44 +32,33 @@ setwd(
 ord_df <-
   read.csv("../../data/VCG/INCLINE_community/INCLINE_community_2018_clean.csv")
 ord_df[1:5, 1:10]
-# make precipitation column
+
+# make precipitation column (annual precipitation)
 ord_df <- ord_df %>%
   mutate(prec = as.integer(ifelse(
-    Site == "Skjellingahaugen",
-    2725,
+    site == "Skjellingahaugen", 3402,
     ifelse(
-      Site == "Gudmedalen",
-      1925,
-      ifelse(Site == "Lavisdalen", 1321,
-             ifelse(Site == "Ulvehaugen", 593, (.)))
+      site == "Gudmedalen",2130,
+      ifelse(
+        site == "Lavisdalen", 1561,
+        ifelse(
+          site == "Ulvehaugen", 1226, (.)))
     )
   ))) %>%
-  select(Site, prec, blockID, plotID, subPlotID, Ach_mil:Vio_sp)
+  select(site, prec, blockID, plotID, subPlotID, Ant_odo:Pru_vul)
 ord_df[1:5, 1:10]
-
-# remove columns and rows without presences
-row0 <-
-  which(rowSums(ord_df[, 6:ncol(ord_df)]) == 0)
-length(row0) # some subplots are empty
-col0 <-
-  which(colSums(ord_df[, 6:ncol(ord_df)]) == 0) + 5
-length(col0) # some species are always absent (add 5 to get the correct column numbers in the col0 object, because we skip the first 5 columns)
-
-ord_df <- ord_df[-row0,-col0] # remove all-0 rows and columns
-rm(row0, col0) # clean up environment
-
 
 # save/load global ordination data frame
 write.csv(ord_df,
           "../../data_processed/ordination_dataframe_global.csv",
           row.names = FALSE)
-ord_df <- read.csv("../../data_processed/ordination_dataframe_global.csv") # "Gud_1_4" missing
+ord_df <- read.csv("../../data_processed/ordination_dataframe_global.csv")
 
 # separate on site
-ord_df_skj <- ord_df[ord_df$Site == "Skjellingahaugen", ]
-ord_df_ulv <- ord_df[ord_df$Site == "Ulvehaugen", ]
-ord_df_lav <- ord_df[ord_df$Site == "Lavisdalen", ]
-ord_df_gud <- ord_df[ord_df$Site == "Gudmedalen", ]
+ord_df_skj <- ord_df[ord_df$site == "Skjellingahaugen", ]
+ord_df_ulv <- ord_df[ord_df$site == "Ulvehaugen", ]
+ord_df_lav <- ord_df[ord_df$site == "Lavisdalen", ]
+ord_df_gud <- ord_df[ord_df$site == "Gudmedalen", ]
 
 # save dfs for later
 write.csv(ord_df_skj,
@@ -84,36 +73,13 @@ write.csv(ord_df_lav,
 write.csv(ord_df_gud,
           "../../data_processed/ord_df_gud.csv",
           row.names = FALSE)
+
 # loading same objects
 ord_df_skj <- read.csv("../../data_processed/ord_df_skj.csv")
 ord_df_ulv <- read.csv("../../data_processed/ord_df_ulv.csv")
 ord_df_lav <- read.csv("../../data_processed/ord_df_lav.csv")
 ord_df_gud <- read.csv("../../data_processed/ord_df_gud.csv")
 
-# separate on site
-ord_df_skj <- ord_df[ord_df$Site == "Skjellingahaugen", ]
-ord_df_ulv <- ord_df[ord_df$Site == "Ulvehaugen", ]
-ord_df_lav <- ord_df[ord_df$Site == "Lavisdalen", ]
-ord_df_gud <- ord_df[ord_df$Site == "Gudmedalen", ]
-
-# save dfs for later
-write.csv(ord_df_skj,
-          "../../data_processed/ord_df_skj.csv",
-          row.names = FALSE)
-write.csv(ord_df_ulv,
-          "../../data_processed/ord_df_ulv.csv",
-          row.names = FALSE)
-write.csv(ord_df_lav,
-          "../../data_processed/ord_df_lav.csv",
-          row.names = FALSE)
-write.csv(ord_df_gud,
-          "../../data_processed/ord_df_gud.csv",
-          row.names = FALSE)
-# loading same objects
-ord_df_skj <- read.csv("../../data_processed/ord_df_skj.csv")
-ord_df_ulv <- read.csv("../../data_processed/ord_df_ulv.csv")
-ord_df_lav <- read.csv("../../data_processed/ord_df_lav.csv")
-ord_df_gud <- read.csv("../../data_processed/ord_df_gud.csv")
 
 # 2. DCA
 # ------------------------------
