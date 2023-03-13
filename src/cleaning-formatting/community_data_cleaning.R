@@ -32,7 +32,7 @@ community$blockID <- substr(community$plotID,
 community$subPlotID <- paste(community$plotID, 
                              community$subPlot,
                              sep = "_")
-
+                             
 # found out subPlotID Skj_7_1_23 is there, but should not be.
 row_to_delete = which(community$subPlotID == "Skj_7_1_23")
 community <- community[-row_to_delete,]
