@@ -57,7 +57,7 @@ community <- unique(community)
 # select only relevant columns, and 
 # pivot wider to get subplots as rows, species as columns
 community <- community %>%
-  select(site, blockID, plotID, subPlotID,  
+  select(site, blockID, plotID, subPlotID, subPlot,  
          logger, vegetation_height_mm, moss_depth_mm,
          species, presence) %>%
   pivot_wider(names_from = species, 
