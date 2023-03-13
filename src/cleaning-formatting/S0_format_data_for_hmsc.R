@@ -25,8 +25,14 @@ setwd("C:/Users/evaler/OneDrive - Universitetet i Oslo/Eva/PHD/hmsc_incline/src/
 SY <- read.csv("../../data/VCG/INCLINE_community/INCLINE_community_2018_clean.csv")
 SY[1:3,1:10]
 
-# remove too rare or common species
-Y = SY[,6:ncol(SY)] # extract species data
+# extract only Study design columns (S) 
+S = SY %>%
+  select(site, blockID, plotID, subPlotID)
+
+# extract species columns (Y)
+Y = SY[,which(names(SY) =="Ant_odo"):ncol(SY)] 
+
+# remove too rare or common species 
 ubiquitous = round(nrow(Y) * 0.9) # define threshold for being too common
 rare = round(nrow(Y) * 0.01) # define threshold for being too rare
 print(paste("too rare if <", rare, "& too common if >", ubiquitous))
@@ -41,7 +47,7 @@ colnames(Y)[grepl('_sp',colnames(Y))] # check for genus-level records. Include f
 species <- c(names(Y))
 write.csv(species,'Data/specieslist.csv',row.names = FALSE)
 
-# order species columns alphabetcally
+# order species columns alphabetically
 Y <- Y[,order(colnames(Y))]
 
 # save SY with the correct species
@@ -90,7 +96,6 @@ for (site in sites) {
   print(paste("mean soil moisture at", site, " is: ", mean_soil_moisture))
   print(paste("number of NAs replaced:", length(NA_rows_mst)))
 }
-
 # "mean soil temperature at skj  is:  10.4243350258643"
 # "mean soil moisture at skj  is:  0.353139166009143"
 # "number of NAs replaced: 812"
@@ -108,18 +113,15 @@ for (site in sites) {
 X <- do.call(rbind, lapply(microclimate_data_list, function(x)
   x[, c("subPlotID", "soil_tmp_mean", "soil_mst_mean")]))
 
-# merge (left join) microclimate data back into SXY
-SXY <- merge(
+# merge (dplyr:left_join) microclimate data back into SXY
+SXY <- left_join(
   x = SXY,
-  all.x = TRUE,
   y = X,
-  by.x = "subPlotID",
-  by.y = "subPlotID"
-)
+  by = "subPlotID",
+  )
 
 # reorder columns
 SXY[1:5, c(1:10,c(ncol(SXY)-5):ncol(SXY))] # show first&last cols
-
 SXY <- SXY %>%
   select(site, blockID, plotID, subPlotID,
        prec, soil_mst_mean, soil_tmp_mean, 

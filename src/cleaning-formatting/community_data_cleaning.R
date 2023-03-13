@@ -55,6 +55,9 @@ community <- unique(community)
 
 # pivot wider
 community <- community %>%
+  select(site, blockID, plotID, subPlotID, subPlot,  
+         logger, vegetation_height_mm, moss_depth_mm,
+         species, presence) %>%
   pivot_wider(names_from = species, 
               values_from = presence)
 

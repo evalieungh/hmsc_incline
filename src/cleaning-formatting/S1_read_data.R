@@ -14,10 +14,11 @@ setwd('C:/Users/evaler/OneDrive - Universitetet i Oslo/Eva/PHD/hmsc_incline/src/
 # READING IN SXY: 
 SXY = read.csv("../../data/SXY.csv", stringsAsFactors=TRUE)
 SXY[1:5,1:10]
+
 #split the SXY file into components
 S=SXY[,1:4] # study design; Columns Site, Block, plot, subPlot
-X=SXY[,5] # covariates to be used as predictors; Column prec (annual precipitation at site)
-Y=SXY[,6:ncol(SXY)] # species data; presence-absence in subplots (could alternatively use subplot frequency, max 29 of 35 subplots per plot)
+X=SXY[,5:7] # covariates to be used as predictors; Column prec (annual precipitation at site)
+Y=SXY[,8:ncol(SXY)] # species data; presence-absence in subplots (could alternatively use subplot frequency, max 29 of 35 subplots per plot)
 # What is not always easy is to decide what goes to S and what to X.
 # As a general rule, include in S those variables that you think should be modelled as random effect,
 # and in X those that you think should be modelled as fixed effects.
@@ -103,4 +104,4 @@ if(is.P){
   plot(P, cex=0.5)
 }
 
-save.image(file = 'Data/allData.R')
+save.image(file = '../../data/allData.R')
