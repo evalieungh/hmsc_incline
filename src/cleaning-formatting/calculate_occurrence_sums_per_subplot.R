@@ -10,20 +10,23 @@ library(vegan) # envfit()
 # read files
 setwd("C:/Users/evaler/OneDrive - Universitetet i Oslo/Eva/PHD/hmsc_incline/src/cleaning-formatting/")
 
-ord_df_list <- readRDS("../../data_processed/ordination_df_sitespecific_list.Rds")
+ord_df_list <- 
+  readRDS("../../data_processed/ordination_df_sitespecific_list.Rds")
 
-best_mds_list = list(skj = readRDS("../../results/models/mds_best_skj.Rds"),
-                     ulv = readRDS("../../results/models/mds_best_ulv.Rds"),
-                     lav = readRDS("../../results/models/mds_best_lav.Rds"),
-                     gud = readRDS("../../results/models/mds_best_gud.Rds"))
+best_mds_list = list(
+  skj = readRDS("../../results/models/mds_best_skj.Rds"),
+  ulv = readRDS("../../results/models/mds_best_ulv.Rds"),
+  lav = readRDS("../../results/models/mds_best_lav.Rds"),
+  gud = readRDS("../../results/models/mds_best_gud.Rds")
+)
 
 sites = c("skj", "ulv", "lav", "gud")
 
 # add columns with occurrence sums per subplot
   # site-specific
 for (site in sites) {
-  first_species_column = which(colnames(ord_df_list[[site]]) == "Ach_mil")
-  last_species_column = which(colnames(ord_df_list[[site]]) == "Vio_riv")
+  first_species_column = which(colnames(ord_df_list[[site]]) == "Ant_odo")
+  last_species_column = ncol(ord_df_list[[site]])
   # calculate sum of presences per row
   ord_df_list[[site]]$occurrences <-
     apply(ord_df_list[[site]][, first_species_column:last_species_column],
