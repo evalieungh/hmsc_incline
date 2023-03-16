@@ -419,9 +419,15 @@ write.csv(dca_species_scores_sitespecific,
 # ------------------------------
 # Global nonmetric multidimensional scaling (GNMDS) ordination
 # with geodetic correction of unreliable dissimilarities for PD > 0.8.
+ord_df <- read.csv("../../data_processed/ordination_dataframe_global.csv")
+ord_df_skj <- read.csv("../../data_processed/ord_df_skj.csv")
+ord_df_ulv <- read.csv("../../data_processed/ord_df_ulv.csv")
+ord_df_lav <- read.csv("../../data_processed/ord_df_lav.csv")
+ord_df_gud <- read.csv("../../data_processed/ord_df_gud.csv")
+
 # First, make proportional dissimilarity (=Bray-Curtis) dissimilarity matrix
 # global
-dist.y <- vegdist(ord_df[, 4:ncol(ord_df)], method = "bray")
+dist.y <- vegdist(ord_df[, 6:ncol(ord_df)], method = "bray")
 saveRDS(dist.y, "../../data_processed/dist_y.Rds")
 dist.y <- readRDS("../../data_processed/dist_y.Rds")
 # site-specific
@@ -444,12 +450,17 @@ dist.y.ulv <- readRDS("../../data_processed/dist_y_ulv.Rds")
 dist.y.lav <- readRDS("../../data_processed/dist_y_lav.Rds")
 dist.y.gud <- readRDS("../../data_processed/dist_y_gud.Rds")
 
-# Replace unreliable distances (B-C > 0.8 by geodetic distances, using the stepacross algorithm
-# Note that the optimal value for epsilon is dataset-specific. For data sets in which one or more observations are weakly related to the rest (disjunct data sets), geodetic correction does not work unless a lower value for epsilon is chosen. In such cases, find the highest value for epsilon that provides results
+# Replace unreliable distances (B-C > 0.8 by geodetic distances, 
+# using the stepacross algorithm.
+# Note that the optimal value for epsilon is dataset-specific. 
+# For data sets in which one or more observations are weakly 
+# related to the rest (disjunct data sets), geodetic correction 
+# does not work unless a lower value for epsilon is chosen. 
+# In such cases, find the highest value for epsilon that provides results
 # global
 geodist.y <-
-  isomapdist(dist.y, epsilon = 0.8) # NB! this step takes a long time
-saveRDS(geodist.y, "data/geodist_y.Rds")
+  isomapdist(dist.y, epsilon = 0.8) # NB! this step takes a long time (15-20mins)
+saveRDS(geodist.y, "../../data_processed/geodist_y.Rds")
 geodist.y <- readRDS("../../data_processed/geodist_y.Rds")
 # site-specific
 geodist.y.skj <- isomapdist(dist.y.skj, epsilon = 0.8)
@@ -502,7 +513,7 @@ for (i in 1:100) {
     sfgrmin = 1e-7
   )
 } # The mds object is now a list consisting of 100 "sub-objects" which themselves are lists.
-
+#12:40--
 # site-specific
 for (i in 1:100) {
   mds_skj[[i]] <- monoMDS(
@@ -700,20 +711,20 @@ mds.2best <- postMDS(
 
 # Procrustes comparisons
 procrustes(mds.best, mds.2best, permutations = 999) # Procrustes sum of squares
-# 257.5 for k=2, 15.8 for k=3, 192.4 for K=4
+# Procrustes sum of squares: 21.35
 protest(mds.best, mds.2best, permutations = 999)
-# Procrustes Sum of Squares (m12 squared):        0.008272
-# Correlation in a symmetric Procrustes rotation: 0.9959
+# Procrustes Sum of Squares (m12 squared):        0.01034
+# Correlation in a symmetric Procrustes rotation: 0.9948
 # Significance:  0.001
 # OK, the two best solutions are similar like they should be
 
-procrustes(mds.best.skj, mds.2best.skj, permutations = 999) # 58.6
+procrustes(mds.best.skj, mds.2best.skj, permutations = 999) # 46.17
 protest(mds.best.skj, mds.2best.skj, permutations = 999) # *
-procrustes(mds.best.ulv, mds.2best.ulv, permutations = 999) # 3.721
+procrustes(mds.best.ulv, mds.2best.ulv, permutations = 999) # 5.278
 protest(mds.best.ulv, mds.2best.ulv, permutations = 999) # *
-procrustes(mds.best.lav, mds.2best.lav, permutations = 999) # 2.134
+procrustes(mds.best.lav, mds.2best.lav, permutations = 999) # 2.362
 protest(mds.best.lav, mds.2best.lav, permutations = 999) # *
-procrustes(mds.best.gud, mds.2best.gud, permutations = 999) # 6.01
+procrustes(mds.best.gud, mds.2best.gud, permutations = 999) # 7.27
 protest(mds.best.gud, mds.2best.gud, permutations = 999) # *
 
 # Procrustes plot
@@ -810,7 +821,7 @@ gnmds3_1 <- readRDS("../../results/models/gnmds3_1.Rds")
 gnmds3_2 <- readRDS("../../results/models/gnmds3_2.Rds")
 gnmds3_3 <- readRDS("../../results/models/gnmds3_3.Rds")
 mds_axes <-
-  read.csv("../../results/models/gnmds_axes_k2_sitespecific.csv")
+  read.csv("../../results/models/ordination/gnmds_axes_k2_sitespecific.csv")
 
 # plot axes against each other
 plot(gnmds3_1, gnmds3_2)
@@ -834,7 +845,7 @@ for (j in sites) {
 # 4. CORRELATE DCA & GNMDS
 # ------------------------------
 # calculate Kendall"s Tau non-parametric rank correlation coefficients
-
+dca <- readRDS("../../results/models/dca_global.Rds")
 # global ordination (across all sites)
 # Following Liu et al. (2008; <DOI>),
 # we commonly regard a tau = 0.4 as a minimum for claiming that
@@ -846,27 +857,27 @@ for (j in sites) {
 # dca3,gnmds2_2 tau=0.3996  p<2.2e-16
 # but several others were close.
 # The final mds fitting with k=3 seems like the most appropriate:
-cor.test(dca1, gnmds3_1, method = "k") # tau=0.8108   p<2.2e-16 *
-cor.test(dca1, gnmds3_2, method = "k") # tau=0.0224   p=0.02846
-cor.test(dca1, gnmds3_3, method = "k") # tau=0.0551   p=6.763e-08
+cor.test(dca1, gnmds3_1, method = "k") # tau=-0.818   p<2.2e-16 *
+cor.test(dca1, gnmds3_2, method = "k") # tau=-0.0253   p=0.00979
+cor.test(dca1, gnmds3_3, method = "k") # tau=-0.0296   p=0.002535
 
-cor.test(dca2, gnmds3_1, method = "k") # tau=-0.2179  p<2.2e-16
-cor.test(dca2, gnmds3_2, method = "k") # tau=-0.1435  p<2.2e-16
-cor.test(dca2, gnmds3_3, method = "k") # tau=0.5820   p<2.2e-16 *
+cor.test(dca2, gnmds3_1, method = "k") # tau=-0.200  p<2.2e-16
+cor.test(dca2, gnmds3_2, method = "k") # tau=0.000512  p=0.958
+cor.test(dca2, gnmds3_3, method = "k") # tau=0.635   p<2.2e-16 *
 
-cor.test(dca3, gnmds3_1, method = "k") # tau=-0.1107  p<2.2e-16
-cor.test(dca3, gnmds3_2, method = "k") # tau=0.4458   p<2.2e-16 *
-cor.test(dca3, gnmds3_3, method = "k") # tau=0.1000   p<2.2e-16
+cor.test(dca3, gnmds3_1, method = "k") # tau=-0.0658  p=1.751e-11
+cor.test(dca3, gnmds3_2, method = "k") # tau=0.474   p<2.2e-16 *
+cor.test(dca3, gnmds3_3, method = "k") # tau=0.0479   p=1.014e-06
 
-cor.test(dca4, gnmds3_1, method = "k") # tau=-0.0473  p=3.674e-06
-cor.test(dca4, gnmds3_2, method = "k") # tau=0.2605   p<2.2e-16
-cor.test(dca4, gnmds3_3, method = "k") # tau=0.1582   p<2.2e-16
+cor.test(dca4, gnmds3_1, method = "k") # tau=-0.003   p=0.759
+cor.test(dca4, gnmds3_2, method = "k") # tau=0.193    p<2.2e-16
+cor.test(dca4, gnmds3_3, method = "k") # tau=0.0814   p<2.2e-16
 
 plot(dca1, gnmds3_1)
 plot(dca2, gnmds3_3)
 plot(dca3, gnmds3_2)
-# Both DCA and GNMDS pick up the same 3 axes,
-# but DCA axis 2 corresponds to GNMDS axis 3 and vice versa.
+# Both DCA and GNMDS pick up the same 3 axes.
+# DCA axis 2 corresponds to GNMDS axis 3 and vice versa.
 # Because DCA2 shows an artifact, we choose the nmds axes for further analyses
 
 # site-specific correlations

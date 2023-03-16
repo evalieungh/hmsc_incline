@@ -25,19 +25,24 @@ setwd('C:/Users/evaler/OneDrive - Universitetet i Oslo/Eva/PHD/hmsc_incline/src/
   # global ordination with k = 3 (three-dimensional solution)
 mds <- readRDS('../../results/models/mds_k3.Rds') 
 
-gnmds3_1 <- readRDS('../../results/models/gnmds3_1.Rds') # axis 1
-gnmds3_2 <- readRDS('../../results/models/gnmds3_2.Rds') # axis 2
-gnmds3_3 <- readRDS('../../results/models/gnmds3_3.Rds')
+gnmds3_1 <- readRDS('../../results/models/ordination/gnmds3_1.Rds') # axis 1
+gnmds3_2 <- readRDS('../../results/models/ordination/gnmds3_2.Rds') # axis 2
+gnmds3_3 <- readRDS('../../results/models/ordination/gnmds3_3.Rds')
 
-species_scores_global <- data.frame(mds1var = readRDS('../../results/models/k3_mds1var.Rds'), # species scores for axis 1
-                                    mds2var = readRDS('../../results/models/k3_mds2var.Rds'), # species scores for axis 2
-                                    mds3var = readRDS('../../results/models/k3_mds3var.Rds'))
+species_scores_global <-
+  data.frame(
+    mds1var = readRDS('../../results/models/ordination/k3_mds1var.Rds'),
+    # species scores for axis 1
+    mds2var = readRDS('../../results/models/ordination/k3_mds2var.Rds'),
+    # species scores for axis 2
+    mds3var = readRDS('../../results/models/ordination/k3_mds3var.Rds')
+  )
 
 ord_df <- readRDS('../../data_processed/ord_df.Rds') # data frame with ordination axes and species occurrences; to be modified further down
 ord_df[1:5,1:10]
 
   # site-specific
-ord_df_list <- readRDS("../../data_processed/ordination_df_sitespecific_list.Rds")
+ord_df_list <- readRDS("../../data_processed/ordination_df_sitespecific_list_occurrencesums.Rds")
 
 species_scores_list <- readRDS("../../results/gnmds_k2_species_scores_sitespecific.Rds")
 
@@ -115,14 +120,14 @@ for (site in sites) {
       caption = paste("Blue arrow: envfit vector of number of species per subplot, r = ",
                       round(occurrence_vector_list[[site]]$vectors$r, digits = 2))
     ) +
-    # add site scores for subplots, 
-    # colour them by sum of occurrences
-    geom_point(aes(colour = ord_df_list[[site]]$occurrences),
-               size = 1) +
-    scale_colour_gradient(
-      low = "yellow",
-      high = "red"
-    ) +
+    # # add site scores for subplots, 
+    # # colour them by sum of occurrences
+    # geom_point(aes(colour = ord_df_list[[site]]$occurrences),
+    #            size = 1) +
+    # scale_colour_gradient(
+    #   low = "yellow",
+    #   high = "red"
+    # ) +
     # add species labels
     ggrepel::geom_text_repel(
       data = sitespecific_df,
