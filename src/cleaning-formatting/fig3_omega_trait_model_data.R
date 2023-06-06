@@ -148,7 +148,9 @@ for (i in 1:nrow(data)) {
     occupancies[which(names(occupancies) == data$speciesB[i])] / nrow(Y)
 }
 
-write.csv(data, "data_processed/fig3_omegas_traits_data.csv")
+write.csv(data, 
+          "data_processed/fig3_omegas_traits_data.csv",
+          row.names = FALSE)
 
 # make glms of omegas modelled by trait differences
 # ---------------------------------------------------
@@ -230,10 +232,9 @@ tail(model_data)
 model_data = model_data[,c(1,3,4,7)]
 head(model_data)
 
+sub('.*>>', '', x)
 # rename some columns
-model_data$siteID = substr(model_data$L1,
-                           nchar(model_data$L1)-2,
-                           999)
+model_data$siteID = sub(".*_", "", model_data$L1)
 names(model_data)[2]="Estimate"
 names(model_data)[4]="SE"
 head(model_data)

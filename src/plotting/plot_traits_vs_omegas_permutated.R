@@ -20,3 +20,199 @@ library(ggplot2)
 
 # read data
 # --------------------------------
+setwd("C:/Users/evaler/OneDrive - Universitetet i Oslo/Eva/PHD/hmsc_incline/")
+
+data <- read.csv("data_processed/fig3_omegas_traits_data.csv")
+modeldata <- readRDS("data_processed/fig3_omega-trait_model_data.Rds")
+
+# set labels for plotting
+labels = c(
+  height_mm_diff = "Height",
+  fresh_mass_g_diff = "Fresh mass",
+  dry_mass_g_diff = "Dry mass",
+  leaf_area_cm2_diff = "Leaf area",
+  SLA_cm2_g_diff = "SLA",
+  LDMC_g_g_diff = "LDMC",
+  leaf_thickness_diff = "Leaf thickness",
+  N_percent_diff = "N percent",
+  C_percent_diff = "C percent",
+  CN_ratio_diff = "CN ratio"
+)
+
+# set order of sites so they appear from driest to wettest
+modeldata$siteID <- factor(
+  modeldata$siteID,
+  levels = c("Ulvehaugen",
+             "Lavisdalen",
+             "Gudmedalen",
+             "Skjellingahaugen")
+)
+
+# not sure whether to use this: 
+# split data into two groups to make x axis more readable in plots
+morphological_traits = c("height_mm_diff",
+                         "fresh_mass_g_diff",
+                         "dry_mass_g_diff",
+                         "leaf_area_cm2_diff",
+                         "SLA_cm2_g_diff",
+                         "LDMC_g_g_diff",
+                         "leaf_thickness_diff")
+
+modeldata_morphological <-
+  modeldata[modeldata$Var1 %in% morphological_traits, ]
+
+chemical_traits = c("N_percent_diff",
+                    "C_percent_diff",
+                    "CN_ratio_diff")
+
+modeldata_chemical <-
+  modeldata[modeldata$Var1 %in% chemical_traits, ]
+
+# make plot
+# --------------------------------
+# Significance level set to 95 %, but can be changed by changing code below.
+# The x axis shows the model coefficient for the trait's influence on the omegas
+# for the given site.
+fig3 <-
+  ggplot(modeldata[which(modeldata$Var1 != "(Intercept)"),],
+         aes(
+           x = Coefficient,
+           y = siteID,
+           xmin = min95,
+           xmax = max95,
+           color = Sig95
+         )) + 
+  theme_light() +
+  theme(panel.grid = element_blank(),
+        panel.background = element_blank())
+
+fig3 +
+  facet_grid(Var1 ~ ., 
+             labeller = labeller(Var1 = labels)) +
+  geom_pointrange(
+    color = "grey87",
+    size = 2,
+    fatten = 0.03,
+    aes(
+      x = Coefficient,
+      y = siteID,
+      xmin = min95,
+      xmax = max95
+    )
+  ) +
+  # geom_pointrange(
+  #   color = "grey74",
+  #   size = 3,
+  #   fatten = 0.03,
+  #   aes(
+  #     x = Coefficient,
+  #     y = siteID,
+  #     xmin = Sim50min,
+  #     xmax = Sim50max
+  #   )
+  # ) +
+  geom_pointrange(color = 
+                    modeldata$Sig90[which(modeldata$Var1 != "(Intercept)")], 
+                  size = 0.75
+                  ) +
+  geom_vline(xintercept = 0,
+             color = "black",
+             size = 0.5) + 
+  xlab("Regression parameter")
+
+# make similar plot, but split into morphological and chemical traits
+# --------------------------------------------------------------------
+fig3a <-
+  ggplot(modeldata_morphological,
+         aes(
+           x = Coefficient,
+           y = siteID,
+           xmin = min95,
+           xmax = max95,
+           color = Sig95
+         )) + 
+  theme_light() +
+  theme(panel.grid = element_blank(),
+        panel.background = element_blank())
+
+fig3a +
+  facet_grid(Var1 ~ ., 
+             labeller = labeller(Var1 = labels)) +
+  geom_pointrange(
+    color = "grey87",
+    size = 2,
+    fatten = 0.03,
+    aes(
+      x = Coefficient,
+      y = siteID,
+      xmin = min95,
+      xmax = max95
+    )
+  ) +
+  # geom_pointrange(
+  #   color = "grey74",
+  #   size = 3,
+  #   fatten = 0.03,
+  #   aes(
+  #     x = Coefficient,
+  #     y = siteID,
+  #     xmin = Sim50min,
+  #     xmax = Sim50max
+  #   )
+  # ) +
+geom_pointrange(color = modeldata_morphological$Sig90, 
+                size = 0.75
+) +
+  geom_vline(xintercept = 0,
+             color = "black",
+             size = 0.5) + 
+  xlab("Regression parameter")
+
+# ---------------
+
+fig3b <-
+  ggplot(modeldata_chemical,
+         aes(
+           x = Coefficient,
+           y = siteID,
+           xmin = min95,
+           xmax = max95,
+           color = Sig95
+         )) + 
+  theme_light() +
+  theme(panel.grid = element_blank(),
+        panel.background = element_blank())
+
+fig3b +
+  facet_grid(Var1 ~ ., 
+             labeller = labeller(Var1 = labels)) +
+  geom_pointrange(
+    color = "grey87",
+    size = 2,
+    fatten = 0.03,
+    aes(
+      x = Coefficient,
+      y = siteID,
+      xmin = min95,
+      xmax = max95
+    )
+  ) +
+  # geom_pointrange(
+  #   color = "grey74",
+  #   size = 3,
+  #   fatten = 0.03,
+  #   aes(
+  #     x = Coefficient,
+  #     y = siteID,
+  #     xmin = Sim50min,
+  #     xmax = Sim50max
+  #   )
+  # ) +
+geom_pointrange(color = modeldata_chemical$Sig90, 
+                size = 0.75
+) +
+  geom_vline(xintercept = 0,
+             color = "black",
+             size = 0.5) + 
+  xlab("Regression parameter")
+
