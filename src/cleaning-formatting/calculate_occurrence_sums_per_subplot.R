@@ -8,16 +8,16 @@
 library(vegan) # envfit()
 
 # read files
-setwd("C:/Users/evaler/OneDrive - Universitetet i Oslo/Eva/PHD/hmsc_incline/src/cleaning-formatting/")
+setwd("C:/Users/evaler/OneDrive - Universitetet i Oslo/Eva/PHD/hmsc_incline/src/")
 
 ord_df_list <- 
-  readRDS("../../data_processed/ordination_df_sitespecific_list.Rds")
+  readRDS("../data_processed/ordination_df_sitespecific_list.Rds")
 
 best_mds_list = list(
-  skj = readRDS("../../results/models/mds_best_skj.Rds"),
-  ulv = readRDS("../../results/models/mds_best_ulv.Rds"),
-  lav = readRDS("../../results/models/mds_best_lav.Rds"),
-  gud = readRDS("../../results/models/mds_best_gud.Rds")
+  skj = readRDS("../results/models/mds_best_skj.Rds"),
+  ulv = readRDS("../results/models/mds_best_ulv.Rds"),
+  lav = readRDS("../results/models/mds_best_lav.Rds"),
+  gud = readRDS("../results/models/mds_best_gud.Rds")
 )
 
 sites = c("skj", "ulv", "lav", "gud")
@@ -40,12 +40,11 @@ for (site in sites) {
                             first_species_column:last_species_column)]
 }
 
-saveRDS(ord_df_list, "../../data_processed/ordination_df_sitespecific_list_occurrencesums.Rds")
+saveRDS(ord_df_list, "../data_processed/ordination_df_sitespecific_list_occurrencesums.Rds")
 
 # Calculate vectors for occurrence sums
   # site-specific
 occurrence_vector_list = list()
-
 for (site in sites) {
   occurrencesum_column_number = as.double(which(colnames(ord_df_list[[site]]) == "occurrences"))
   occurrence_vector_list[[site]] <-
@@ -54,4 +53,4 @@ for (site in sites) {
            permutations = 999)
 }
 
-saveRDS(occurrence_vector_list, "../../data_processed/occurrence_sums_sitespecific_vector_list.Rds")
+saveRDS(occurrence_vector_list, "../data_processed/occurrence_sums_sitespecific_vector_list.Rds")

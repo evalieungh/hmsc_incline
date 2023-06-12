@@ -17,6 +17,8 @@
 
 library(tidyverse)
 library(ggplot2)
+library(cowplot)
+library(patchwork)
 
 # read data
 # --------------------------------
@@ -84,13 +86,17 @@ fig3 <-
          )) + 
   theme_light() +
   theme(panel.grid = element_blank(),
-        panel.background = element_blank())
+        panel.border = element_rect(colour = "black", fill = NA),
+        panel.background = element_blank(),
+        strip.background = element_rect(colour = "white", fill = "black"),
+        axis.text = element_text(color = "black"),
+        axis.title = element_text(color = "black"))
 
 fig3 +
   facet_grid(Var1 ~ ., 
              labeller = labeller(Var1 = labels)) +
   geom_pointrange(
-    color = "grey87",
+    color = "black",
     size = 2,
     fatten = 0.03,
     aes(
@@ -112,13 +118,14 @@ fig3 +
   #   )
   # ) +
   geom_pointrange(color = 
-                    modeldata$Sig90[which(modeldata$Var1 != "(Intercept)")], 
+                    modeldata$Sig95[which(modeldata$Var1 != "(Intercept)")], 
                   size = 0.75
                   ) +
   geom_vline(xintercept = 0,
              color = "black",
              size = 0.5) + 
-  xlab("Regression parameter")
+  xlab("Regression parameter") +
+  ylab("Site, from wettest (Skjellingahaugen) to driest (Ulveaugen)")
 
 # make similar plot, but split into morphological and chemical traits
 # --------------------------------------------------------------------
@@ -133,40 +140,49 @@ fig3a <-
          )) + 
   theme_light() +
   theme(panel.grid = element_blank(),
-        panel.background = element_blank())
+        panel.border = element_rect(colour = "black", fill = NA),
+        panel.background = element_blank(),
+        strip.background = element_rect(colour = "black", fill = "black"),
+        axis.text = element_text(color = "black"),
+        axis.title = element_text(color = "black"))
 
-fig3a +
-  facet_grid(Var1 ~ ., 
-             labeller = labeller(Var1 = labels)) +
-  geom_pointrange(
-    color = "grey87",
-    size = 2,
-    fatten = 0.03,
-    aes(
-      x = Coefficient,
-      y = siteID,
-      xmin = min95,
-      xmax = max95
-    )
-  ) +
-  # geom_pointrange(
-  #   color = "grey74",
-  #   size = 3,
-  #   fatten = 0.03,
-  #   aes(
-  #     x = Coefficient,
-  #     y = siteID,
-  #     xmin = Sim50min,
-  #     xmax = Sim50max
-  #   )
-  # ) +
-geom_pointrange(color = modeldata_morphological$Sig90, 
-                size = 0.75
-) +
-  geom_vline(xintercept = 0,
-             color = "black",
-             size = 0.5) + 
-  xlab("Regression parameter")
+(
+  fig3a <- fig3a +
+    facet_grid(Var1 ~ .,
+               labeller = labeller(Var1 = labels)) +
+    geom_pointrange(
+      color = "grey50",
+      size = 2,
+      fatten = 0.03,
+      aes(
+        x = Coefficient,
+        y = siteID,
+        xmin = min95,
+        xmax = max95
+      )
+    ) +
+    # geom_pointrange(
+    #   color = "grey74",
+    #   size = 3,
+    #   fatten = 0.03,
+    #   aes(
+    #     x = Coefficient,
+    #     y = siteID,
+    #     xmin = Sim50min,
+    #     xmax = Sim50max
+    #   )
+    # ) +
+  geom_pointrange(color = modeldata_morphological$Sig95,
+                  size = 0.75) +
+    geom_vline(
+      xintercept = 0,
+      color = "black",
+      size = 0.5
+    ) +
+    xlab("Regression parameter") +
+    ylab("")
+)
+
 
 # ---------------
 
@@ -181,9 +197,13 @@ fig3b <-
          )) + 
   theme_light() +
   theme(panel.grid = element_blank(),
-        panel.background = element_blank())
+        panel.border = element_rect(colour = "black", fill = NA),
+        panel.background = element_blank(),
+        strip.background = element_rect(colour = "black", fill = "black"),
+        axis.text = element_text(color = "black"),
+        axis.title = element_text(color = "black"))
 
-fig3b +
+(fig3b <- fig3b +
   facet_grid(Var1 ~ ., 
              labeller = labeller(Var1 = labels)) +
   geom_pointrange(
@@ -214,5 +234,37 @@ geom_pointrange(color = modeldata_chemical$Sig90,
   geom_vline(xintercept = 0,
              color = "black",
              size = 0.5) + 
-  xlab("Regression parameter")
+  xlab("Regression parameter") +
+  ylab("")
+)
 
+
+# combine morphological and chemical panels into one figure
+# ------------------------------------------------------------
+
+(fig3_combined <- plot_grid(fig3a, 
+                           fig3b,
+                           labels = c('a', 'b'),
+                           label_size = 10,
+                           nrow = 2, ncol = 1,
+                           rel_heights = c(7, 3)))
+
+ggsave(filename = "results/figures/figure_3.png",
+       plot = fig3_combined,
+       device = "png", 
+       bg = "white",
+       dpi = 300,
+       width = 3,
+       height = 7,
+       scale = 1.5)
+
+ggsave(filename = "results/figures/figure_3.pdf",
+       plot = fig3_combined,
+       device = "pdf",
+       width = 3,
+       height = 7,
+       scale = 1.5)  
+  
+  
+  
+  

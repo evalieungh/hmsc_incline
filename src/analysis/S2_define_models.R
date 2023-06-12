@@ -75,19 +75,19 @@ modelnames = c("global")
 # define site-specific models
 sites = levels(studyDesign$site)
 for(i in 1:length(sites)){
-  sel = which(studyDesign$site==(sites[i]))
+  sel = which(studyDesign$site == (sites[i]))
   studyDesign.local = droplevels(studyDesign[sel,])
   rL.block = HmscRandomLevel(units = levels(studyDesign.local$block))
   rL.plot = HmscRandomLevel(units = levels(studyDesign.local$plot))
   rL.subplot = HmscRandomLevel(units = levels(studyDesign.local$subplot))
-  m = Hmsc(Y=Y[sel,],
+  m = Hmsc(Y = Y[sel,],
            XFormula = ~ 1 + soiltemp + soilmoisture,
            XData = as.data.frame(XData[sel,]),
            distr = "probit",
            studyDesign = studyDesign.local,
            ranLevels = list(
-             block=rL.block,
-             plot=rL.plot,
+             block = rL.block,
+             plot = rL.plot,
              subplot = rL.subplot)
   )                
   models[[i+1]] = m

@@ -1,14 +1,14 @@
-####################################
-#  plot site-specific ordinations  #
-#  with species scores, 
-#  environmental data, 
-#  and traits
-####################################
+#############################################
+#  site-specific gnmds species score plots  #
+#############################################
 
-# script by Eva Lieungh
-# started 2023-01-16
+# script by Eva Lieungh, Rune Halvorsen, Michal Torma
+# started 2023-06-08
 
-# almost identical script to the one for figure 4, but plots ALL species
+library(tidyverse)
+library(vegan)
+
+# create panels for figure 4
 # plot site-specific subplot scores and selected species scores
 # colour subplots by number of species present
 
@@ -32,12 +32,29 @@ for (site in sites) {
   ord_df_list[[site]]$mds2 <- unlist(ord_df_list[[site]]$mds2)
 }
 
-# make plots in loop
+# Calculate the overall min and max values of the color scale
+# as the min and max number of occurrences in a subplot
+(overall_min <- min(unlist(lapply(ord_df_list, 
+                                  function(df) min(df$occurrences)))))
+(overall_max <- max(unlist(lapply(ord_df_list, 
+                                  function(df) max(df$occurrences)))))
+
+# define some species for text labeling
+species = c("Ver_alp",
+            "Sib_pro",
+            "Vio_bif")
+
+# make plots in loop over the four sites
 plot_list = list()
+legends = list()
+
 for (site in sites) {
   print(paste("plotting for site:", site))
+  # define a subset of species to label with text 
   sitespecific_df = as.data.frame(species_scores_list[[site]])
-  speciesnames = rownames(sitespecific_df)
+  species_subset = subset(sitespecific_df, 
+                          rownames(sitespecific_df) %in% species)
+  speciesnames = rownames(species_subset)
   # define site names for plot titles
   sitename = c(ifelse(site == "skj", "Skjellingahaugen, 3402 mm",
                       ifelse(site == "gud", "Gudmedalen, 2130 mm",
@@ -67,14 +84,14 @@ for (site in sites) {
     # add site scores for subplots, 
     # colour them by sum of occurrences
     geom_point(aes(
-      colour = occurrences)) + # ERROR no such index at level 1???
+      colour = occurrences)) +
     scale_colour_gradient(
-      low = "yellow",
-      high = "darkred"
+      low = "yellow", high = "darkred",
+      limits = c(overall_min, overall_max)
     ) +
     # add species labels
     ggrepel::geom_text_repel(
-      data = sitespecific_df,
+      data = species_subset,
       mapping = aes(x = mds1,
                     y = mds2),
       label = speciesnames
@@ -87,19 +104,18 @@ for (site in sites) {
                                type = "closed"), 
                  colour = "black",
                  linewidth = 1) +
-    # # add label to vector
-    # geom_text(aes(x = vector_df$MDS1,
-    #               y = vector_df$MDS2,
-    #               label = round(occurrence_vector_list[[site]]$vectors$r, digits = 2)),
-    #           colour = "blue",
-    #           fill = "white",
-    #           size = 4) +
+    # set some coordinate and ggplot parameters
     coord_fixed() +
     theme_minimal()
-  # print/show the plot in R
-  # print(plot_list[[site]])
+  # store the legend from each plot
+  legends[[site]] <- get_legend(plot_list[[site]])
+  
+  # Remove the legend from individual plots
+  plot_list[[site]] <- plot_list[[site]] +
+    guides(colour = "none")
+
   # save the plot
-  ggsave(filename = paste("all_species_plot_", site, ".png", sep=""),
+  ggsave(filename = paste("species_plot_", site, ".png", sep=""),
          plot = plot_list[[site]],
          path = "results/figures/",
          device = "png", 
@@ -109,4 +125,40 @@ for (site in sites) {
          height = 5,
          scale = 1.5)
 }
+
+# combine the four plots in a composite grid figure
+# -----------------------------------------------------------
+library(cowplot)
+library(patchwork)
+
+composite_plot <- plot_grid(plotlist = plot_list, 
+                            labels = c('a', 'b', 'c', 'd'),
+                            nrow = 2, ncol = 2,
+                            rel_widths = c(1, 2),
+                            align = "h")
+
+# Add legend to the composite plot
+(composite_plot_with_legend <- composite_plot +
+  theme(legend.position = "top", 
+        legend.justification = "right",
+        legend.title.align = 0.5) +
+  guides(colour = guide_legend(
+    override.aes = list(title = "Number of species\npresent in subplot"))) +
+  inset_element(legends[[1]], # all legends are the same, so just pick one
+                left = 0.86, bottom = 0,
+                right = 1, top = 1)) 
+
+ggsave(filename = "results/figures/figure_4.png",
+       plot = composite_plot_with_legend,
+       device = "png", 
+       bg = "white",
+       dpi = 300,
+       width = 5,
+       height = 5,
+       scale = 1.5)
+
+ggsave(filename = "results/figures/figure_4.pdf",
+       plot = composite_plot_with_legend,
+       device = "pdf",
+       scale = 1.5)
 
