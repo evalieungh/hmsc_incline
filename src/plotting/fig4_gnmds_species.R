@@ -7,6 +7,8 @@
 
 library(tidyverse)
 library(vegan)
+library(cowplot)
+library(patchwork)
 
 # create panels for figure 4
 # plot site-specific subplot scores and selected species scores
@@ -40,9 +42,28 @@ for (site in sites) {
                                   function(df) max(df$occurrences)))))
 
 # define some species for text labeling
-species = c("Ver_alp",
-            "Sib_pro",
-            "Vio_bif")
+species = c(
+  "Ver_alp",
+  "Sib_pro",
+  "Vio_bif",
+  #"Sal_her",
+  "Car_big",
+  "Car_pal",
+  "Vac_uli",
+  "Fes_ovi",
+  "Fes_rub",
+  #"Des_fle",
+  "Bis_viv",
+  "Pot_cra",
+  "Pot_ere",
+  #"Gen_niv",
+  #"Oma_sup",
+  #"Sil_aca",
+  #"Ach_mil",
+  #"Poa_pra",
+  #"Agr_cap",
+  "Nar_str"
+)
 
 # make plots in loop over the four sites
 plot_list = list()
@@ -94,7 +115,8 @@ for (site in sites) {
       data = species_subset,
       mapping = aes(x = mds1,
                     y = mds2),
-      label = speciesnames
+      label = speciesnames,
+      max.overlaps = 15
     ) + 
     # add vector
     geom_segment(data = vector_df,
@@ -128,14 +150,21 @@ for (site in sites) {
 
 # combine the four plots in a composite grid figure
 # -----------------------------------------------------------
-library(cowplot)
-library(patchwork)
+# create an empty plot to make space for legend
+blank_plot <- ggplot() +
+  theme_void()
 
-composite_plot <- plot_grid(plotlist = plot_list, 
-                            labels = c('a', 'b', 'c', 'd'),
-                            nrow = 2, ncol = 2,
-                            rel_widths = c(1, 2),
-                            align = "h")
+# specify plots from list manually to get the right order
+composite_plot <- plot_grid(plot_list[["skj"]], 
+                            plot_list[["gud"]],
+                            blank_plot,
+                            plot_list[["lav"]],
+                            plot_list[["ulv"]],
+                            labels = c('a', 'b', '', 'c', 'd'),
+                            nrow = 2, ncol = 3,
+                            rel_widths = c(1, 1, 0.5),
+                            align = "hv")
+
 
 # Add legend to the composite plot
 (composite_plot_with_legend <- composite_plot +
@@ -145,7 +174,7 @@ composite_plot <- plot_grid(plotlist = plot_list,
   guides(colour = guide_legend(
     override.aes = list(title = "Number of species\npresent in subplot"))) +
   inset_element(legends[[1]], # all legends are the same, so just pick one
-                left = 0.86, bottom = 0,
+                left = 0.8, bottom = 0.6,
                 right = 1, top = 1)) 
 
 ggsave(filename = "results/figures/figure_4.png",
