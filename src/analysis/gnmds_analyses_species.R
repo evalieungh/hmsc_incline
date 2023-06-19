@@ -21,32 +21,32 @@ library(plotly)} # for 3D plotting
 # (...)
 
 # read data
-setwd('C:/Users/evaler/OneDrive - Universitetet i Oslo/Eva/PHD/hmsc_incline/src/analysis/')
+setwd('C:/Users/evaler/OneDrive - Universitetet i Oslo/Eva/PHD/hmsc_incline/')
   # global ordination with k = 3 (three-dimensional solution)
-mds <- readRDS('../../results/models/mds_k3.Rds') 
+mds <- readRDS('results/models/mds_k3.Rds') 
 
-gnmds3_1 <- readRDS('../../results/models/ordination/gnmds3_1.Rds') # axis 1
-gnmds3_2 <- readRDS('../../results/models/ordination/gnmds3_2.Rds') # axis 2
-gnmds3_3 <- readRDS('../../results/models/ordination/gnmds3_3.Rds')
+gnmds3_1 <- readRDS('results/models/ordination/gnmds3_1.Rds') # axis 1
+gnmds3_2 <- readRDS('results/models/ordination/gnmds3_2.Rds') # axis 2
+gnmds3_3 <- readRDS('results/models/ordination/gnmds3_3.Rds')
 
 species_scores_global <-
   data.frame(
-    mds1var = readRDS('../../results/models/ordination/k3_mds1var.Rds'),
+    mds1var = readRDS('results/models/ordination/k3_mds1var.Rds'),
     # species scores for axis 1
-    mds2var = readRDS('../../results/models/ordination/k3_mds2var.Rds'),
+    mds2var = readRDS('results/models/ordination/k3_mds2var.Rds'),
     # species scores for axis 2
-    mds3var = readRDS('../../results/models/ordination/k3_mds3var.Rds')
+    mds3var = readRDS('results/models/ordination/k3_mds3var.Rds')
   )
 
-ord_df <- readRDS('../../data_processed/ord_df.Rds') # data frame with ordination axes and species occurrences; to be modified further down
+ord_df <- readRDS('data_processed/ord_df.Rds') # data frame with ordination axes and species occurrences; to be modified further down
 ord_df[1:5,1:10]
 
   # site-specific
-ord_df_list <- readRDS("../../data_processed/ordination_df_sitespecific_list_occurrencesums.Rds")
+ord_df_list <- readRDS("data_processed/ordination_df_sitespecific_list_occurrencesums.Rds")
 
-species_scores_list <- readRDS("../../results/gnmds_k2_species_scores_sitespecific.Rds")
+species_scores_list <- readRDS("results/gnmds_k2_species_scores_sitespecific.Rds")
 
-occurrence_vector_list <- readRDS("../../data_processed/occurrence_sums_sitespecific_vector_list.Rds")
+occurrence_vector_list <- readRDS("data_processed/occurrence_sums_sitespecific_vector_list.Rds")
 
 sites = c("skj", "ulv", "lav", "gud")
 
@@ -87,7 +87,7 @@ for (i in 2:3) {
   ggsave(
     filename = paste("species_plot_global_1", i, ".png", sep = ""),
     plot = plot_list[[i]],
-    path = "../../results/figures/",
+    path = "results/figures/",
     device = "png",
     bg = "white",
     dpi = "print",
@@ -157,7 +157,7 @@ for (site in sites) {
   # save the plot
   ggsave(filename = paste("species_plot_", site, ".png", sep=""),
          plot = plot_list[[site]],
-         path = "../../results/figures/",
+         path = "results/figures/",
          device = "png", 
          bg = "white",
          dpi = "print",
@@ -255,10 +255,10 @@ traitvec13_df$trait <- rownames(traitvec13_df)
 # 2. CO-OCCURRENCES
 # ------------------------------
 # get gnmds species score vs species score differences, test correlation to omegas
-omegas_l <- readRDS('../../data_processed/omegas_long.Rds') # from format_omegas.R
-mds1var <- readRDS('../../results/models/k3_mds1var.Rds') # species scores for axis 1
-mds2var <- readRDS('../../results/models/k3_mds2var.Rds')
-mds3var <- readRDS('../../results/models/k3_mds3var.Rds')
+omegas_l <- readRDS('data_processed/omegas_long.Rds') # from format_omegas.R
+mds1var <- readRDS('results/models/k3_mds1var.Rds') # species scores for axis 1
+mds2var <- readRDS('results/models/k3_mds2var.Rds')
+mds3var <- readRDS('results/models/k3_mds3var.Rds')
 
 # compute differences in species scores per axis
 mds1_diff <- sapply(mds1var, function(x) mds1var - x)
