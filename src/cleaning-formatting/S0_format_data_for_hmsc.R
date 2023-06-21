@@ -15,14 +15,14 @@
 
 library(tidyverse)
 
-setwd("C:/Users/evaler/OneDrive - Universitetet i Oslo/Eva/PHD/hmsc_incline/src/cleaning-formatting/")
+setwd("C:/Users/evaler/OneDrive - Universitetet i Oslo/Eva/PHD/hmsc_incline/")
 
 # Study design (S) and species occurrences (Y)
 #------------------------------------------
 # start SXY object from community data to be filled with more columns
 # Each row is a subplot presence/absence from 2018.
 # There are 29 subplots *40 plots *4 sites = 4640 rows
-SY <- read.csv("../../data/VCG/INCLINE_community/INCLINE_community_2018_clean.csv")
+SY <- read.csv("data/VCG/INCLINE_community/INCLINE_community_2018_clean.csv")
 SY[1:3,1:10]
 
 # extract only Study design columns (S) 
@@ -45,7 +45,7 @@ colnames(Y)[grepl('_sp',colnames(Y))] # check for genus-level records. Include f
 # final list of species to include
 species <- c(names(Y))
 print(paste(length(names(Y)),"species included in analyses"))
-write.csv(species,"../../data/specieslist.csv",row.names = FALSE)
+write.csv(species,"data/specieslist.csv",row.names = FALSE)
 
 # order species columns alphabetically
 Y <- Y[,order(colnames(Y))]
@@ -70,8 +70,8 @@ SXY <- SY %>%
 
 # soil moisture and temperature
 microclimate_data_list <- 
-  readRDS('../../data_processed/subplot_data_sitespecific_list.Rds')
-microclimate_data_list[["skj"]][1:5,1:10] # NB site name has capital S
+  readRDS('data_processed/subplot_data_sitespecific_list.Rds')
+microclimate_data_list[["skj"]][1:5,1:10] 
 
 # fill in NAs with site mean for soil moisture and temperature. 
 # Covariates cannot have NAs.
@@ -146,7 +146,7 @@ SXY <- SXY %>%
 SXY[1:5,1:20]
 
 # export SXY file
-write.csv(SXY,"../../data/SXY.csv", row.names = FALSE)
+write.csv(SXY,"data/SXY.csv", row.names = FALSE)
 
 # Reference
 # Gya, R., Töpper, J.P., Olsen, S.L., Lieungh, E., Gaudard, J., Egelkraut, D.,

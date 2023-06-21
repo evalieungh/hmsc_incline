@@ -5,10 +5,10 @@
 # script by Otso Ovaskainen, Eva Lieungh
 # started 2022-04-26
 
-setwd("C:/Users/evaler/OneDrive - Universitetet i Oslo/Eva/PHD/hmsc_incline/src/analysis/")
+setwd("C:/Users/evaler/OneDrive - Universitetet i Oslo/Eva/PHD/hmsc_incline/")
 library(Hmsc)
 
-da = read.csv("../../data/SXY.csv")
+da = read.csv("data/SXY.csv")
 n = dim(da)[1]
 
 # create representation of spatial study design of subplots
@@ -99,4 +99,4 @@ for(i in 1:length(models)){
   sampleMcmc(models[[i]],samples = 2)
 }
 
-save(models,modelnames,file = "../../data_processed/models/unfitted_models")
+save(models,modelnames,file = "data_processed/models/unfitted_models")

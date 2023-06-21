@@ -12,12 +12,17 @@
 
 library(tidyverse)
 
-setwd("C:/Users/evaler/OneDrive - Universitetet i Oslo/Eva/PHD/hmsc_incline/src/cleaning-formatting/")
+setwd("C:/Users/evaler/OneDrive - Universitetet i Oslo/Eva/PHD/hmsc_incline/")
 
 community <- 
-  read.csv("../../data/VCG/INCLINE_community/INCLINE_community_subplot.csv", 
+  read.csv("data/VCG/INCLINE_community/INCLINE_community_subplot.csv", 
                       sep = ";")
 head(community)
+
+# one row has NA instead of 0/1. Change to 0
+community[community$plotID == "Gud_7_4" &
+            community$subPlot == "2" &
+            community$species == "Ran_acr", "presence"] <- 0
 
 # subset only 2018 data
 community <- subset(community,year==2018)
@@ -55,6 +60,6 @@ community <- community[, -which(names(community) %in% remove_these_species)]
 
 # save clean data
 write.csv(community,
-          "../../data/VCG/INCLINE_community/INCLINE_community_2018_clean.csv",
+          "data/VCG/INCLINE_community/INCLINE_community_2018_clean.csv",
           row.names = FALSE)
 

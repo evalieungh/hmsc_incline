@@ -17,7 +17,7 @@ setwd("C:/Users/evaler/OneDrive - Universitetet i Oslo/Eva/PHD/hmsc_incline/")
 a_skj <- read.csv('results/OO_2023-03-22_scripts_and_results/results/parameter_estimates_Omega_Skjellingahaugen_subplot_mean.csv',
                   row.names = 1, sep = ";", dec = ",")
 a_gud <- read.csv('results/OO_2023-03-22_scripts_and_results/results/parameter_estimates_Omega_Gudmedalen_subplot_mean.csv',
-                  row.names = 1, sep = ";", dec = ",") # estimated associations
+                  row.names = 1, sep = ";", dec = ",") 
 a_lav <- read.csv('results/OO_2023-03-22_scripts_and_results/results/parameter_estimates_Omega_Lavisdalen_subplot_mean.csv',
                   row.names = 1, sep = ";", dec = ",")
 a_ulv <- read.csv('results/OO_2023-03-22_scripts_and_results/results/parameter_estimates_Omega_Ulvehaugen_subplot_mean.csv',
@@ -214,7 +214,7 @@ saveRDS(df,'data_processed/omegas_species_sums.RData')
 # subsetting
 # -----------------------------------
 # subset 'friends' and 'enemies', 
-# saved from the S10_omegas_stats script
+# saved from the omegas_stats script
 friend_rows <- read.csv('data/friend_rows.csv')
 enemy_rows <- read.csv('data/enemy_rows.csv')
 

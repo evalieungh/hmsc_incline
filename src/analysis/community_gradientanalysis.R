@@ -6,6 +6,8 @@
 # started 2022-12 from Rune's script used in 
 # BIOS9210 – Methods of Gradient Analysis
 
+# R 4.2.3
+
 # community data downloaded from INCLINE OSF repository
 # prerequisite: community_cleaning script to get
 # subplot presences as rows, species as columns
@@ -22,8 +24,8 @@
 # 4. Correlate DCA & GNMDS
 # 5. Calculate NMDS species scores
 
-library(tidyverse) # formatting
-library(vegan) # gradient analysis
+library(tidyverse) # formatting, v 2.0.0
+library(vegan) # gradient analysis, v 2.6-4
 
 # 1. VIEW AND FORMAT DATA
 # ------------------------------
@@ -35,7 +37,7 @@ ord_df <-
   read.csv("../../data/VCG/INCLINE_community/INCLINE_community_2018_clean.csv")
 ord_df[1:5, 1:10]
 
-# make precipitation column (annual precipitation)
+# make precipitation column (annual precipitation); see Gya 2022
 ord_df <- ord_df %>%
   mutate(prec = as.integer(ifelse(
     site == "Skjellingahaugen", 3402,
