@@ -8,6 +8,8 @@
 
 library(tidyverse)
 
+setwd("C:/Users/evaler/OneDrive - Universitetet i Oslo/Eva/PHD/hmsc_incline/")
+
 # read in data
 a_obj_full <- readRDS('data/a_obj_full.RData')
 a_obj <- readRDS('data/a_obj_lower.RData')
@@ -134,6 +136,13 @@ write.csv(friend_pairs,
 write.csv(enemy_pairs,
           'results/enemy_pairs.csv',
           row.names = FALSE)
+
+# distribution of co-occurrences
+# -------------------------------------------
+omegas_l <- readRDS("data_processed/omegas_long.Rds")
+hist(omegas_l$omega, breaks = 20)
+hist(omegas_l[omegas_l$siteID=="Skjellingahaugen",]$omega, breaks = 20)
+
 
 # strength of co-occurrences
 #--------------------------------------------

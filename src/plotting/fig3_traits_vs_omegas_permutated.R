@@ -17,8 +17,8 @@
 
 library(tidyverse)
 library(ggplot2)
-library(cowplot)
-library(patchwork)
+library(cowplot) # to combine plots
+library(patchwork) 
 
 # read data
 # --------------------------------
@@ -50,7 +50,23 @@ modeldata$siteID <- factor(
              "Skjellingahaugen")
 )
 
-# not sure whether to use this: 
+# add precipitation levels
+modeldata <- modeldata %>%
+  mutate(prec = ifelse(
+    siteID == "Skjellingahaugen", "3402",
+    ifelse(siteID == "Gudmedalen", "2130",
+      ifelse(siteID == "Lavisdalen", "1561",
+        ifelse(siteID == "Ulvehaugen", "1226", (.))
+      )
+    )
+  ))
+
+modeldata$prec <- factor(modeldata$prec,
+                         levels = c("3402",
+                                    "2130",
+                                    "1561",
+                                    "1226"))
+
 # split data into two groups to make x axis more readable in plots
 morphological_traits = c("height_mm_diff",
                          "fresh_mass_g_diff",
@@ -70,16 +86,17 @@ chemical_traits = c("N_percent_diff",
 modeldata_chemical <-
   modeldata[modeldata$Var1 %in% chemical_traits, ]
 
-# make plot
+# make plot (all traits together)
 # --------------------------------
-# Significance level set to 95 %, but can be changed by changing code below.
-# The x axis shows the model coefficient for the trait's influence on the omegas
+# Significance level set to 95 %
+# The x axis shows the model coefficient for the trait's 
+# influence on the omegas (co-occurrence estimates)
 # for the given site.
 fig3 <-
   ggplot(modeldata[which(modeldata$Var1 != "(Intercept)"),],
          aes(
            x = Coefficient,
-           y = siteID,
+           y = prec, # alternative: siteID
            xmin = min95,
            xmax = max95,
            color = Sig95
@@ -101,7 +118,7 @@ fig3 +
     fatten = 0.03,
     aes(
       x = Coefficient,
-      y = siteID,
+      y = prec, # alternative: siteID
       xmin = min95,
       xmax = max95
     )
@@ -127,13 +144,13 @@ fig3 +
   xlab("Regression parameter") +
   ylab("Site, from wettest (Skjellingahaugen) to driest (Ulveaugen)")
 
-# make similar plot, but split into morphological and chemical traits
+# split plot into morphological and chemical traits
 # --------------------------------------------------------------------
 fig3a <-
   ggplot(modeldata_morphological,
          aes(
            x = Coefficient,
-           y = siteID,
+           y = prec,
            xmin = min95,
            xmax = max95,
            color = Sig95
@@ -156,7 +173,7 @@ fig3a <-
       fatten = 0.03,
       aes(
         x = Coefficient,
-        y = siteID,
+        y = prec,
         xmin = min95,
         xmax = max95
       )
@@ -180,7 +197,7 @@ fig3a <-
       size = 0.5
     ) +
     xlab("Regression parameter") +
-    ylab("")
+    ylab("Sites by mean annual precipitation (mm)")
 )
 
 
@@ -190,7 +207,7 @@ fig3b <-
   ggplot(modeldata_chemical,
          aes(
            x = Coefficient,
-           y = siteID,
+           y = prec,
            xmin = min95,
            xmax = max95,
            color = Sig95
@@ -212,22 +229,11 @@ fig3b <-
     fatten = 0.03,
     aes(
       x = Coefficient,
-      y = siteID,
+      y = prec,
       xmin = min95,
       xmax = max95
     )
   ) +
-  # geom_pointrange(
-  #   color = "grey74",
-  #   size = 3,
-  #   fatten = 0.03,
-  #   aes(
-  #     x = Coefficient,
-  #     y = siteID,
-  #     xmin = Sim50min,
-  #     xmax = Sim50max
-  #   )
-  # ) +
 geom_pointrange(color = modeldata_chemical$Sig90, 
                 size = 0.75
 ) +
@@ -235,7 +241,7 @@ geom_pointrange(color = modeldata_chemical$Sig90,
              color = "black",
              size = 0.5) + 
   xlab("Regression parameter") +
-  ylab("")
+  ylab("Sites by mean annual\nprecipitation (mm)")
 )
 
 
