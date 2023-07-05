@@ -2,27 +2,25 @@
 #   trait data   #
 ##################
 
-# Script by EL
+# script by EL
+# started 2023-03-07
 
 # clean and format trait data from SeedClim 2016 and 2017 measurements 
 # (Ragnhild Gya MSC thesis data)
 # Data stored on SeedClim OSF (Vandvik et al. in prep) as 
 # SeedClim_Trait_data_2012_2016.csv
 
-# 
-
 library(tidyverse)
 
+# read data
 traits <- read.csv('../../data/traits/SeedClim_Trait_data_2012_2016.csv') # available trait data
 Species <- read.csv('../../data/specieslist.csv') # list of species used in models
 gram <- read.csv('../../data/graminoids.csv') # filled in from memory + googling
 
-# To do?: find and add seed mass trait from some other source! Ragnhild suggests: Kew, TRY, BIEN eller Tundra Trait Team 
-
 # Select only Ragnhild's data from 2016, 2017,
 traits <- traits[traits$year==c(2016)|traits$year==c(2017),]
 # ...and only INCLINE sites
-inclinesites = c('Gudmedalen','Lavisdalen','Ulvehaugen','Skjelingahaugen')
+inclinesites = c('Gudmedalen','Lavisdalen','Ulvehaugen','Skjelingahaugen') # NB spelling may differ in different datasets!
 traits <- traits[traits$siteID %in% inclinesites,]
 
 # get species names in same format as Species list
@@ -91,13 +89,13 @@ l.index = which(is.na(leaf_area$leaf_area_cm2), arr.ind = TRUE)
 leaf_area$species[l.index]
 
 
+
 # Make site-specific trait matrices?
 #----------------------------------------
 # Check for trait differences between sites
 aggregate(height$height_mm, list(height$siteID), FUN=mean) # does not seem to vary with precipitaion level, but it is quite different among sites.
 aggregate(leaf_area$leaf_area_cm2, list(leaf_area$siteID), FUN=mean) 
 aggregate(sla$SLA_cm2_g, list(sla$siteID), FUN=mean) 
-
 
 # get height per species
 h.gud <- height[height$siteID=='Gudmedalen'|height$siteID=='global',] # site subset

@@ -6,8 +6,13 @@ data/archive/
 data_processed/
 resources/
 results/
+results/RB_2023-02-29_notes
+results/figures
+results/models
+results/OO_2023-03-22_scripts_and_results
 writing/
 src/archive/
+src/allData.R
 src/.Rdata
 src/.Rhistory
 src/.RDataTmp
@@ -17,3 +22,5 @@ src/.RData
 src/.Ruserdata
 src/.Rproj.user
 src/III_incline_hmsc.Rproj
+src/gramforb.R
+src/HMSC-pipeline/

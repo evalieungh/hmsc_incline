@@ -1,6 +1,6 @@
-#############################
-#    gnmds axes analysis    #
-#############################
+#####################################################
+#    gnmds axes analysis: co-occurrences, traits    #
+#####################################################
 
 # Script by Eva L
 # started 2023-01-16
@@ -10,118 +10,164 @@ library(vegan) # gradient analysis
 library(graphics)  # identify points on ordination diagrams
 library(plotly)} # for 3D plotting
 
-# 1. precipitation
-# 2. climatic predictors
+# 1. species scores global
+# 2. species scores vs number of species in subplot
 # 3. sla, height, leaf area
-# 4. co-occurrences
+
+# This script...
+# formats data a bit, 
+# plots plot and species scores
+# with occurrence sums and envfit vector
+# (...)
 
 # read data
-setwd('C:/Users/evaler/OneDrive - Universitetet i Oslo/Eva/PHD/hmsc_incline/src/analysis/')
-mds <- readRDS('../../results/models/mds_k3.Rds') # ordination with k = 3 (three-dimensional solution)
+setwd('C:/Users/evaler/OneDrive - Universitetet i Oslo/Eva/PHD/hmsc_incline/')
+  # global ordination with k = 3 (three-dimensional solution)
+mds <- readRDS('results/models/mds_k3.Rds') 
 
-gnmds3_1 <- readRDS('../../results/models/gnmds3_1.Rds') # axis 1
-gnmds3_2 <- readRDS('../../results/models/gnmds3_2.Rds')
-gnmds3_3 <- readRDS('../../results/models/gnmds3_3.Rds')
+gnmds3_1 <- readRDS('results/models/ordination/gnmds3_1.Rds') # axis 1
+gnmds3_2 <- readRDS('results/models/ordination/gnmds3_2.Rds') # axis 2
+gnmds3_3 <- readRDS('results/models/ordination/gnmds3_3.Rds')
 
-mds1var <- readRDS('../../results/models/k3_mds1var.Rds') # species scores for axis 1
-mds2var <- readRDS('../../results/models/k3_mds2var.Rds')
-mds3var <- readRDS('../../results/models/k3_mds3var.Rds')
+species_scores_global <-
+  data.frame(
+    mds1var = readRDS('results/models/ordination/k3_mds1var.Rds'),
+    # species scores for axis 1
+    mds2var = readRDS('results/models/ordination/k3_mds2var.Rds'),
+    # species scores for axis 2
+    mds3var = readRDS('results/models/ordination/k3_mds3var.Rds')
+  )
 
-ord_df <- readRDS('../../data_processed/ord_df.Rds') # data frame with ordination axes and species occurrences; to be modified further down
+ord_df <- readRDS('data_processed/ord_df.Rds') # data frame with ordination axes and species occurrences; to be modified further down
 ord_df[1:5,1:10]
 
-# 1. PRECIPITATION LEVELS
-# -----------------------------------
-# check correlations between ordination axis and precipitation level.
-cor.test(gnmds3_1,ord_df$prec,method="k") # tau=0.355  p<2.2e-16
-cor.test(gnmds3_3,ord_df$prec,method="k") # tau=-0.224 p<2.2e-16
-cor.test(gnmds3_2,ord_df$prec,method="k") # tau=-0.297 p<2.2e-16
+  # site-specific
+ord_df_list <- readRDS("data_processed/ordination_df_sitespecific_list_occurrencesums.Rds")
 
-# calculate envfit vectors
-prec_vector12 <- envfit(ord_df[,c('mds1','mds2')], ord_df$prec, permutations = 999)
-prec_vector12 # prints coordinates for vector arrowheads and r-squared = 0.437
-prec_vector13 <- envfit(ord_df[,c('mds1','mds3')], ord_df$prec, permutations = 999)
-prec_vector13 # prints coordinates for vector arrowheads and r-squared = 0.373  
+species_scores_list <- readRDS("results/gnmds_k2_species_scores_sitespecific.Rds")
 
-# plot axes and colour points by precipitation level (site)
-ord_df$prec <- factor(ord_df$prec) # specify precipitation level as factor to use as grouping variable below
-(prec_plot <- ggplot() + 
-    geom_text(data=species.scores,aes(x=mds1var,y=mds2var,label=species),alpha=0.5) +
-    geom_point(data=ord_df,
-               aes(x=mds1,y=mds2,shape=prec,colour=prec),size=3) +
-    coord_equal() +
-    theme_classic())
+occurrence_vector_list <- readRDS("data_processed/occurrence_sums_sitespecific_vector_list.Rds")
 
-(prec_plot <- ggplot() + 
-    geom_point(data=ord_df,
-               aes(x=mds1,y=mds3,shape=prec,colour=prec),size=3) +
-    coord_equal() +
-    theme_classic())
+sites = c("skj", "ulv", "lav", "gud")
 
-# 3D plot, see https://plotly.com/r/reference/
-plot_ly(x = ord_df$mds1,
-        y = ord_df$mds2, 
-        z = ord_df$mds3, 
-        color = ord_df$prec,
-        type="scatter3d", 
-        mode="markers",
-        size = 3) 
 
-# 2. MICROCLIMATIC PREDICTORS
+
+# SPECIES SCORES
 # ------------------------------
-# other climatic variables might be more important than precipitation.
-# See microclimate_formatting.R for data download and handling.
-ord_df2 <- readRDS('../../data_processed/ord_df2.Rds')
-ord_df2[1:5,1:10]
+# compare relative gnmds species scores
+  # global
+plot_list = list()
+for (i in 2:3) {
+  gnmds_number = paste("mds", i, sep = "")
+  y_axis = ord_df[, gnmds_number]
+  if (i == 2) {
+    mds_var = mds2var
+  } else {
+    mds_var = mds3var
+  }
+  plot_list[[i]] <-
+    ggplot(ord_df, aes(x = mds1,
+                       y = y_axis)) +
+    labs(
+      title = paste("global GNMDS relative species scores"),
+      x = "gnmds axis 1",
+      y = paste("gnmds axis", i)
+    ) +
+    geom_point(color = "grey", size = 0.7) +
+    ggrepel::geom_text_repel(
+      data = species_scores_global,
+      mapping = aes(x = mds1var,
+                    y = mds_var),
+      label = rownames(species_scores_global),
+      check_overlap = FALSE,
+      size = 3
+    ) +
+    theme_minimal()
+  #print(plot_list[[i]])
+  ggsave(
+    filename = paste("species_plot_global_1", i, ".png", sep = ""),
+    plot = plot_list[[i]],
+    path = "results/figures/",
+    device = "png",
+    bg = "white",
+    dpi = "print",
+    width = 5,
+    height = 5,
+    scale = 2
+  )
+}
 
-# check correlations between axes and ...
-  # soil moisture
-cor.test(ord_df2$mds1,ord_df2$soil_mst_mean,method="k") # tau=0.266   p<2.2e-16
-cor.test(ord_df2$mds2,ord_df2$soil_mst_mean,method="k") # tau=-0.0270 p<2.2e-16
-cor.test(ord_df2$mds3,ord_df2$soil_mst_mean,method="k") # tau=-0.227  p<2.2e-16
-{par(mfrow=c(1,2))
-plot(ord_df2$mds1,ord_df2$soil_mst_mean)
-plot(ord_df2$mds3,ord_df2$soil_mst_mean)}
-  # air temperature
+# site-specific
+plot_list = list()
+for (site in sites) {
+  print(paste("plotting for site:", site))
+  sitespecific_df = as.data.frame(species_scores_list[[site]])
+  speciesnames = rownames(sitespecific_df)
+  vector_df = as.data.frame(scores(occurrence_vector_list[[site]], display = "vectors"))
+  # start plotting
+  plot_list[[site]] <-
+    ggplot(ord_df_list[[site]],
+           aes(
+             x = unlist(ord_df_list[[site]]$mds1),
+             y = unlist(ord_df_list[[site]]$mds2)
+           )) +
+    # add labels
+    labs(
+      title = paste("GNMDS relative species scores:", toupper(site)),
+      x = "gnmds axis 1",
+      y = "gnmds axis 2",
+      colour = "number of species\n present in subplot",
+      caption = paste("Blue arrow: envfit vector of number of species per subplot, r = ",
+                      round(occurrence_vector_list[[site]]$vectors$r, digits = 2))
+    ) +
+    # # add site scores for subplots, 
+    # # colour them by sum of occurrences
+    # geom_point(aes(colour = ord_df_list[[site]]$occurrences),
+    #            size = 1) +
+    # scale_colour_gradient(
+    #   low = "yellow",
+    #   high = "red"
+    # ) +
+    # add species labels
+    ggrepel::geom_text_repel(
+      data = sitespecific_df,
+      mapping = aes(x = mds1,
+                    y = mds2),
+      label = speciesnames
+    ) + 
+    # add vector
+    geom_segment(data = vector_df,
+                 aes(x = 0, xend = vector_df$MDS1,
+                     y = 0, yend = vector_df$MDS2),
+                 arrow = arrow(length = unit(0.5, "mm",),
+                               type = "closed"), 
+                 colour = "blue",
+                 size = 1.5) +
+    # # add label to vector
+    # geom_text(aes(x = vector_df$MDS1,
+    #               y = vector_df$MDS2,
+    #               label = round(occurrence_vector_list[[site]]$vectors$r, digits = 2)),
+    #           colour = "blue",
+    #           fill = "white",
+    #           size = 4) +
+    coord_fixed() +
+    theme_minimal()
+  # print/show the plot in R
+  # print(plot_list[[site]])
+  # save the plot
+  ggsave(filename = paste("species_plot_", site, ".png", sep=""),
+         plot = plot_list[[site]],
+         path = "results/figures/",
+         device = "png", 
+         bg = "white",
+         dpi = "print",
+         width = 5,
+         height = 5,
+         scale = 2)
+}
 
-  # ground temperature
 
-  # soil temperature
-
-# calculate envfit vectors
-ord_df2_soilmst <- subset(ord_df2, !is.na(ord_df2$soil_mst_mean))
-(v_sm_12 <- envfit(ord_df2_soilmst[,c('mds1','mds2')], # ordination space
-                       ord_df2_soilmst$soil_mst_mean, # environmental variable
-                       permutations = 999))
-(v_sm_13 <- envfit(ord_df2_soilmst[,c('mds1','mds3')], # ordination space
-                   ord_df2_soilmst$soil_mst_mean, # environmental variable
-                   permutations = 999))
-ord_df2_soiltmp <- # ... 
-
-v_sm_12 <- as.data.frame(scores(v_sm_12, display = "vectors"))
-# v_sm_13 <- as.data.frame(scores(v_sm_12, display = "vectors"))
-
-plot_12 <- ggplot(ord_df2, 
-                  aes(x = mds1, y = mds2, colour = Site)) + 
-  coord_equal() +
-  geom_point(size = 1, alpha = 0.3) +
-  geom_segment(x = 0, y = 0,
-               xend = v_sm_12$mds1,
-               yend = v_sm_12$mds2,
-               arrow = arrow(), colour = 'black') +
-  theme_classic()
-
-plot_13 <- ggplot(ord_df2, 
-                  aes(x = mds1, y = mds3, colour = Site)) + 
-  coord_equal() +
-  geom_point(size = 1, alpha = 0.3) +
-  geom_segment(x = 0, y = 0,
-               xend = v_sm_13$mds1,
-               yend = v_sm_13$mds2,
-               arrow = arrow(), colour = 'black') +
-  theme_classic()
-
-# 3. SLA, HEIGHT, LEAF AREA
+# 3. SLA, HEIGHT, LEAF AREA - NB needs updating!
 # ------------------------------
 # compare measured traits to species scores
 
@@ -206,13 +252,13 @@ traitvec13_df$trait <- rownames(traitvec13_df)
          y = "gnmds axis 3") +
     theme_classic())
 
-# 4. CO-OCCURRENCES
+# 2. CO-OCCURRENCES
 # ------------------------------
 # get gnmds species score vs species score differences, test correlation to omegas
-omegas_l <- readRDS('../../data_processed/omegas_long.Rds') # from format_omegas.R
-mds1var <- readRDS('../../results/models/k3_mds1var.Rds') # species scores for axis 1
-mds2var <- readRDS('../../results/models/k3_mds2var.Rds')
-mds3var <- readRDS('../../results/models/k3_mds3var.Rds')
+omegas_l <- readRDS('data_processed/omegas_long.Rds') # from format_omegas.R
+mds1var <- readRDS('results/models/k3_mds1var.Rds') # species scores for axis 1
+mds2var <- readRDS('results/models/k3_mds2var.Rds')
+mds3var <- readRDS('results/models/k3_mds3var.Rds')
 
 # compute differences in species scores per axis
 mds1_diff <- sapply(mds1var, function(x) mds1var - x)
@@ -277,6 +323,7 @@ for (i in siteID) {
   print(cor(na.omit(test[test$mds_axis==3 | test$siteID == i,]$diff),
             na.omit(test[test$mds_axis==3 | test$siteID == i,]$omega)))
 }
+
 
 # --------------------------------------------------
 # sources/inspiration: 
