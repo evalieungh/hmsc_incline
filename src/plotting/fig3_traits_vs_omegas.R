@@ -3,8 +3,10 @@
 #      and pairwise co-occurrence scores      #
 ###############################################
 
-# Script by Eva Lieungh, Ryan Burner
+# Script by Eva Lieungh
 # started 2023-01-26
+
+# inspired by unpublished script by Ryan Burner
 
 # this scripts relies on data made with fig3_omega_trait_model_data.R
 

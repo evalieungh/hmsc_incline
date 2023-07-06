@@ -4,8 +4,10 @@
 #  for figure 3                  #
 ##################################
 
-# Script by Eva Lieungh, Ryan Burner
+# Script by Eva Lieungh
 # started 2023-01-26
+
+# inspired by unpublished script by Ryan Burner
 
 # this script creates data files:
 # data_processed/fig3_omegas_traits_data.csv
