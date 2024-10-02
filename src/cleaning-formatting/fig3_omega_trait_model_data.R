@@ -90,6 +90,11 @@ traits_species <- traits %>%
                 'Skjellingahaugen'))
 colnames(traits_species)[colnames(traits_species) == "species"] <- "speciesA"
 head(traits_species)
+
+# save traits object
+saveRDS(traits_species, 
+        'data_processed/traits_localmax.Rds')
+
 # combine omega and trait data
 data <- omegas %>%
   left_join(traits_species,

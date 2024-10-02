@@ -1,6 +1,6 @@
-# traits and species co-occurrences with Hmsc, ordination methods and INCLINE data
+# traits and species co-occurrences with Hmsc and INCLINE data
 
-This repository contains scripts for a manuscript about traits and species co-occurrences, using [Hmsc](https://www.helsinki.fi/en/researchgroups/statistical-ecology/software/hmsc), ordination methods and INCLINE data. 
+This repository contains scripts for a manuscript about traits and species co-occurrences, using [Hmsc](https://www.helsinki.fi/en/researchgroups/statistical-ecology/software/hmsc) and INCLINE data. 
 
 ## NB! this is a work in progress. The scripts are not 100% clean and finished, and results may not be reproducible. Some scripts have been heavily inspired by other sources.
 
@@ -16,7 +16,6 @@ evaleriksen[at]gmail.com
 ## Related resources:
 
 - Otso Ovaskainen, & Eva Lieungh. (2023). Model output for five Hmsc models of alpine grassland communities (1.0) [Data set]. Zenodo. <https://doi.org/10.5281/zenodo.8064101>
-- Eva Lieungh, & Rune Halvorsen. (2023). DCA and GNMDS output for 4640 subplots and 95 vascular plant species in four alpine grasslands (1.0) [Data set]. Zenodo. <https://doi.org/10.5281/zenodo.8064319>
 - INCLINE data repository will be published on OSF along with a data paper by Gya et al. (in prep): https://osf.io/zhk3m/ 
 - HMSC pipeline example scripts that follow the book. Scripts available from the [hmsc webpage](https://www.helsinki.fi/en/researchgroups/statistical-ecology/software/hmsc). Book: Ovaskainen, O., & Abrego, N. (2020). Joint Species Distribution Modelling (1st ed.). Cambridge University Press. ISBN: 9781108716789.
 
@@ -32,7 +31,7 @@ This is the folder structure in my local copy of the directory. Most of these fo
 | writing | manuscript drafts and backups, other texts |
 | results | output files, models, figures etc. |
 | resources | external resources not to be uploaded (add to .gitignore) |
-| src   | code, notebooks etc for analysis |
+| src   | scripts/code/notebooks |
 | .gitignore | file specifying folders and files Git should not track or upload |
 | README.md | this file, read as the front page of GitHub repository |
 
@@ -42,7 +41,7 @@ PhD project funded by the Norwegian Ministry of Education and Research, through 
 
 ### Sharing and access
 
-Copy snippets freely, but please refer to this repository if you use large parts of several scripts (that is, if you are doing most of the same analyses and your starting point is a copy of these scripts). See for instance the [ICMJE authorship guidelines (Vancouver convention)](https://www.icmje.org/recommendations/browse/roles-and-responsibilities/defining-the-role-of-authors-and-contributors.html) to help you decide which kind of acknowledgement is appropriate. 
+See license. Copy snippets freely, but please refer to this repository if you use large parts of several scripts (that is, if you are doing most of the same analyses and your starting point is a copy of these scripts). See for instance the [ICMJE authorship guidelines (Vancouver convention)](https://www.icmje.org/recommendations/browse/roles-and-responsibilities/defining-the-role-of-authors-and-contributors.html) to help you decide which kind of acknowledgement is appropriate. 
 
 ### Help and useful tricks
 

@@ -149,6 +149,9 @@ saveRDS(grnd_tmp,'../../data_processed/ground_temperature_hourly_noOTC.Rds')
   # 1.4. soil temperature
 saveRDS(soil_tmp,'../../data_processed/soil_temperature_hourly_noOTC.Rds')
 
+# Count how many plots ave loggers. There are 40*4=160 plots in total.
+length(unique(soil_mst$plotID)) # 46 plots with data
+
 # the community data is from 2018, but we only have microclimate data from 2019. 
 # There are many species in this community that die back completely above ground 
 # each year, but overwinter as roots. Which individuals grow back might vary 
